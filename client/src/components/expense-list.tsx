@@ -370,7 +370,7 @@ export function ExpenseList() {
         <div className="text-3xl font-bold text-right">
           {formatCurrency(spendableBalance)}
         </div>
-        <p className="text-sm text-opacity-90 mt-1">
+        <p className="text-sm text-opacity-90 mt-1 text-right">
           After {formatCurrency(totalExpenses)} in expenses
         </p>
       </div>
