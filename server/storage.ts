@@ -203,7 +203,7 @@ export class MemStorage implements IStorage {
       description: insertExpense.description,
       amount: insertExpense.amount,
       category: insertExpense.category,
-      notes: insertExpense.notes || null,
+      notes: insertExpense.notes ?? null,
       createdAt: new Date()
     };
     this.expenses.set(id, expense);

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -15,6 +16,7 @@ export function ExpenseList() {
   const [editDescription, setEditDescription] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [editCategory, setEditCategory] = useState("");
+  const [editNotes, setEditNotes] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -78,6 +80,7 @@ export function ExpenseList() {
     setEditDescription(expense.description);
     setEditAmount(expense.amount);
     setEditCategory(expense.category);
+    setEditNotes(expense.notes || "");
   };
 
   const cancelEditing = () => {
@@ -85,6 +88,7 @@ export function ExpenseList() {
     setEditDescription("");
     setEditAmount("");
     setEditCategory("");
+    setEditNotes("");
   };
 
   const saveEdit = () => {
@@ -113,6 +117,7 @@ export function ExpenseList() {
         description: editDescription.trim(),
         amount: editAmount,
         category: editCategory,
+        notes: editNotes.trim() || null,
       },
     });
   };
@@ -262,6 +267,9 @@ export function ExpenseList() {
                       <div>
                         <h3 className="font-medium text-slate-900">{expense.description}</h3>
                         <p className="text-sm text-slate-500">{formatDate(expense.createdAt)}</p>
+                        {expense.notes && (
+                          <p className="text-xs text-slate-400 mt-1 italic">"{expense.notes}"</p>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
