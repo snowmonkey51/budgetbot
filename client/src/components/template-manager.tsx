@@ -53,7 +53,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
 
   const createTemplateMutation = useMutation({
     mutationFn: async (template: InsertTemplate) => {
-      return apiRequest("/api/templates", "POST", template);
+      return apiRequest("POST", "/api/templates", template);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
@@ -64,7 +64,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
 
   const updateTemplateMutation = useMutation({
     mutationFn: async ({ id, ...template }: { id: number } & Partial<InsertTemplate>) => {
-      return apiRequest(`/api/templates/${id}`, "PUT", template);
+      return apiRequest("PUT", `/api/templates/${id}`, template);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
@@ -76,7 +76,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
 
   const deleteTemplateMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/templates/${id}`, "DELETE");
+      return apiRequest("DELETE", `/api/templates/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
@@ -86,7 +86,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
 
   const addItemMutation = useMutation({
     mutationFn: async ({ templateId, ...item }: { templateId: number } & InsertTemplateItem) => {
-      return apiRequest(`/api/templates/${templateId}/items`, "POST", item);
+      return apiRequest("POST", `/api/templates/${templateId}/items`, item);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
@@ -98,7 +98,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
 
   const updateItemMutation = useMutation({
     mutationFn: async ({ id, ...item }: { id: number } & Partial<InsertTemplateItem>) => {
-      return apiRequest(`/api/template-items/${id}`, "PUT", item);
+      return apiRequest("PUT", `/api/template-items/${id}`, item);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
@@ -110,7 +110,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
 
   const deleteItemMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/template-items/${id}`, "DELETE");
+      return apiRequest("DELETE", `/api/template-items/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
@@ -120,7 +120,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
 
   const loadTemplateMutation = useMutation({
     mutationFn: async (templateId: number) => {
-      return apiRequest("/api/templates/" + templateId + "/load", "POST", { targetPeriod: period });
+      return apiRequest("POST", "/api/templates/" + templateId + "/load", { targetPeriod: period });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
