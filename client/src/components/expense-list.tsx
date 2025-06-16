@@ -319,7 +319,7 @@ export function ExpenseList() {
                       <div>
                         <h3 className="font-medium text-slate-900">{expense.description}</h3>
                         {expense.notes && (
-                          <p className="text-xs text-slate-400 mt-1 italic">"{expense.notes}"</p>
+                          <p className="text-xs text-slate-400 mt-1">"{expense.notes}"</p>
                         )}
                       </div>
                     </div>
