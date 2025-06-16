@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +17,7 @@ export function ExpenseForm() {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
+  const [notes, setNotes] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -34,6 +36,7 @@ export function ExpenseForm() {
       setDescription("");
       setAmount("");
       setCategory("");
+      setNotes("");
       toast({
         title: "Expense Added",
         description: "Your expense has been successfully added.",
@@ -83,6 +86,7 @@ export function ExpenseForm() {
       description: description.trim(),
       amount: amount,
       category,
+      notes: notes.trim() || null,
     });
   };
 
@@ -164,6 +168,19 @@ export function ExpenseForm() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="expense-notes" className="text-sm font-medium text-slate-700">
+                Notes (optional)
+              </Label>
+              <Textarea
+                id="expense-notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="mt-1 h-20"
+                placeholder="Add any additional notes..."
+              />
             </div>
           </div>
 
