@@ -1,4 +1,20 @@
-import { Balance, Expense, Category, type InsertBalance, type InsertExpense, type InsertCategory, balance, expenses, categories } from "@shared/schema";
+import { 
+  Balance, 
+  Expense, 
+  Category, 
+  Template,
+  TemplateItem,
+  type InsertBalance, 
+  type InsertExpense, 
+  type InsertCategory,
+  type InsertTemplate,
+  type InsertTemplateItem,
+  balance, 
+  expenses, 
+  categories,
+  templates,
+  templateItems
+} from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -19,6 +35,16 @@ export interface IStorage {
   updateExpense(id: number, expense: Partial<InsertExpense>): Promise<Expense | undefined>;
   deleteExpense(id: number): Promise<boolean>;
   toggleExpenseCleared(id: number): Promise<Expense | undefined>;
+  
+  // Template operations
+  getTemplates(period?: string): Promise<(Template & { items: TemplateItem[] })[]>;
+  createTemplate(template: InsertTemplate): Promise<Template>;
+  updateTemplate(id: number, template: Partial<InsertTemplate>): Promise<Template | undefined>;
+  deleteTemplate(id: number): Promise<boolean>;
+  addTemplateItem(templateId: number, item: InsertTemplateItem): Promise<TemplateItem>;
+  updateTemplateItem(id: number, item: Partial<InsertTemplateItem>): Promise<TemplateItem | undefined>;
+  deleteTemplateItem(id: number): Promise<boolean>;
+  loadTemplate(templateId: number): Promise<Expense[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -125,14 +151,108 @@ export class DatabaseStorage implements IStorage {
     
     return updated || undefined;
   }
+
+  async getTemplates(period?: string): Promise<(Template & { items: TemplateItem[] })[]> {
+    const templatesQuery = db.select().from(templates);
+    const templateList = period 
+      ? await templatesQuery.where(eq(templates.period, period))
+      : await templatesQuery;
+
+    const result = [];
+    for (const template of templateList) {
+      const items = await db.select().from(templateItems).where(eq(templateItems.templateId, template.id));
+      result.push({ ...template, items });
+    }
+    
+    return result;
+  }
+
+  async createTemplate(insertTemplate: InsertTemplate): Promise<Template> {
+    const [template] = await db
+      .insert(templates)
+      .values(insertTemplate)
+      .returning();
+    return template;
+  }
+
+  async updateTemplate(id: number, updates: Partial<InsertTemplate>): Promise<Template | undefined> {
+    const [updated] = await db
+      .update(templates)
+      .set(updates)
+      .where(eq(templates.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteTemplate(id: number): Promise<boolean> {
+    const result = await db
+      .delete(templates)
+      .where(eq(templates.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  async addTemplateItem(templateId: number, item: InsertTemplateItem): Promise<TemplateItem> {
+    const [templateItem] = await db
+      .insert(templateItems)
+      .values({ ...item, templateId })
+      .returning();
+    return templateItem;
+  }
+
+  async updateTemplateItem(id: number, updates: Partial<InsertTemplateItem>): Promise<TemplateItem | undefined> {
+    const [updated] = await db
+      .update(templateItems)
+      .set(updates)
+      .where(eq(templateItems.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteTemplateItem(id: number): Promise<boolean> {
+    const result = await db
+      .delete(templateItems)
+      .where(eq(templateItems.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  async loadTemplate(templateId: number): Promise<Expense[]> {
+    const template = await db.select().from(templates).where(eq(templates.id, templateId)).limit(1);
+    if (!template.length) return [];
+
+    const items = await db.select().from(templateItems).where(eq(templateItems.templateId, templateId));
+    
+    const newExpenses: Expense[] = [];
+    for (const item of items) {
+      const [expense] = await db
+        .insert(expenses)
+        .values({
+          description: item.description,
+          amount: item.amount,
+          category: item.category,
+          notes: item.notes,
+          period: template[0].period,
+          cleared: false
+        })
+        .returning();
+      newExpenses.push(expense);
+    }
+    
+    return newExpenses;
+  }
 }
 
 export class MemStorage implements IStorage {
   private balance: Balance | null = null;
   private categories: Map<number, Category> = new Map();
   private expenses: Map<number, Expense> = new Map();
+  private templates: Map<number, Template> = new Map();
+  private templateItems: Map<number, TemplateItem> = new Map();
   private currentCategoryId: number = 1;
   private currentExpenseId: number = 1;
+  private currentTemplateId: number = 1;
+  private currentTemplateItemId: number = 1;
 
   constructor() {
     // Initialize with default balance
@@ -265,6 +385,100 @@ export class MemStorage implements IStorage {
     };
     this.expenses.set(id, updated);
     return updated;
+  }
+
+  async getTemplates(period?: string): Promise<(Template & { items: TemplateItem[] })[]> {
+    const allTemplates = Array.from(this.templates.values());
+    const filteredTemplates = period ? allTemplates.filter(t => t.period === period) : allTemplates;
+    
+    return filteredTemplates.map(template => ({
+      ...template,
+      items: Array.from(this.templateItems.values()).filter(item => item.templateId === template.id)
+    }));
+  }
+
+  async createTemplate(insertTemplate: InsertTemplate): Promise<Template> {
+    const id = this.currentTemplateId++;
+    const template: Template = {
+      ...insertTemplate,
+      id,
+      createdAt: new Date()
+    };
+    this.templates.set(id, template);
+    return template;
+  }
+
+  async updateTemplate(id: number, updates: Partial<InsertTemplate>): Promise<Template | undefined> {
+    const existing = this.templates.get(id);
+    if (!existing) return undefined;
+
+    const updated: Template = {
+      ...existing,
+      ...updates
+    };
+    this.templates.set(id, updated);
+    return updated;
+  }
+
+  async deleteTemplate(id: number): Promise<boolean> {
+    // Delete all template items first
+    const items = Array.from(this.templateItems.values()).filter(item => item.templateId === id);
+    items.forEach(item => this.templateItems.delete(item.id));
+    
+    return this.templates.delete(id);
+  }
+
+  async addTemplateItem(templateId: number, item: InsertTemplateItem): Promise<TemplateItem> {
+    const id = this.currentTemplateItemId++;
+    const templateItem: TemplateItem = {
+      ...item,
+      id,
+      templateId
+    };
+    this.templateItems.set(id, templateItem);
+    return templateItem;
+  }
+
+  async updateTemplateItem(id: number, updates: Partial<InsertTemplateItem>): Promise<TemplateItem | undefined> {
+    const existing = this.templateItems.get(id);
+    if (!existing) return undefined;
+
+    const updated: TemplateItem = {
+      ...existing,
+      ...updates
+    };
+    this.templateItems.set(id, updated);
+    return updated;
+  }
+
+  async deleteTemplateItem(id: number): Promise<boolean> {
+    return this.templateItems.delete(id);
+  }
+
+  async loadTemplate(templateId: number): Promise<Expense[]> {
+    const template = this.templates.get(templateId);
+    if (!template) return [];
+
+    const items = Array.from(this.templateItems.values()).filter(item => item.templateId === templateId);
+    
+    const newExpenses: Expense[] = [];
+    for (const item of items) {
+      const id = this.currentExpenseId++;
+      const expense: Expense = {
+        id,
+        description: item.description,
+        amount: item.amount,
+        category: item.category,
+        notes: item.notes || null,
+        period: template.period,
+        cleared: false,
+        createdAt: new Date()
+      };
+      this.expenses.set(id, expense);
+      newExpenses.push(expense);
+    }
+    
+    return newExpenses;
   }
 }
 
