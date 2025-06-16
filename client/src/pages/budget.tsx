@@ -1,7 +1,7 @@
 import { BalanceForm } from "@/components/balance-form";
-import { ExpenseFormFirst } from "@/components/expense-form-first";
+import { ExpenseForm } from "@/components/expense-form";
 import { ExpenseList } from "@/components/expense-list";
-import { SpendingChartFirst } from "@/components/spending-chart-first";
+import { SpendingChart } from "@/components/spending-chart";
 import { QuickTemplate } from "@/components/quick-template";
 import { TemplateLoader } from "@/components/template-loader";
 import { Wallet } from "lucide-react";
@@ -12,12 +12,12 @@ export default function Budget() {
       {/* Left Panel */}
       <div className="lg:col-span-1 space-y-6">
         <BalanceForm />
-        <ExpenseFormFirst />
+        <ExpenseForm />
         <div className="flex gap-2">
           <QuickTemplate period="first-half" />
           <TemplateLoader period="first-half" />
         </div>
-        <SpendingChartFirst />
+        <SpendingChart />
       </div>
 
       {/* Right Panel */}
