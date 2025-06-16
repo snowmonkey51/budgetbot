@@ -17,7 +17,7 @@ export default function Budget() {
           <QuickTemplate period="first-half" />
           <TemplateLoader period="first-half" />
         </div>
-        <SpendingChart />
+
       </div>
 
       {/* Right Panel */}
