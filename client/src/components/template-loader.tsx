@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Download, FileText, Edit, Trash2, Plus, Save, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
+import { Download, FileText, Edit, Trash2, Plus, Save, GripVertical, ChevronUp, ChevronDown, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import type { Template, TemplateItem, Category } from "@shared/schema";
@@ -19,6 +19,7 @@ interface TemplateLoaderProps {
 export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<(Template & { items: TemplateItem[] }) | null>(null);
+  const [viewingTemplate, setViewingTemplate] = useState<(Template & { items: TemplateItem[] }) | null>(null);
   const [editedName, setEditedName] = useState("");
   const [editedItems, setEditedItems] = useState<TemplateItem[]>([]);
   const { toast } = useToast();
@@ -199,6 +200,13 @@ export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => setViewingTemplate(template)}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => startEditingTemplate(template)}
                     >
                       <Edit className="w-4 h-4" />
@@ -364,6 +372,74 @@ export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps
                   className="flex-1"
                 >
                   Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View Template Dialog */}
+      <Dialog open={!!viewingTemplate} onOpenChange={() => setViewingTemplate(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Template Preview: {viewingTemplate?.name}</DialogTitle>
+          </DialogHeader>
+          {viewingTemplate && (
+            <div className="space-y-4">
+              <div className="bg-slate-50 rounded-lg p-4">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    {viewingTemplate.items.length} expenses
+                  </h3>
+                  <p className="text-2xl font-bold text-blue-600">
+                    ${viewingTemplate.items.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)}
+                  </p>
+                  <p className="text-sm text-slate-500">Total Amount</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {viewingTemplate.items
+                  .sort((a, b) => a.category.localeCompare(b.category))
+                  .map((item, index) => {
+                    const category = categories?.find(cat => cat.name.toLowerCase() === item.category.toLowerCase());
+                    return (
+                      <div key={index} className="flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-slate-50 transition-colors">
+                        <div className={`w-10 h-10 ${category?.color || 'bg-gray-100'} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <span className="text-lg">{category?.icon || '📋'}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium text-slate-900 truncate">{item.description}</h4>
+                            <span className="font-semibold text-slate-900 ml-2">${item.amount}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <span className="capitalize">{item.category}</span>
+                            {item.notes && (
+                              <>
+                                <span>•</span>
+                                <span className="truncate">{item.notes}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              <div className="pt-4 border-t">
+                <Button
+                  onClick={() => {
+                    loadTemplateMutation.mutate(viewingTemplate.id);
+                    setViewingTemplate(null);
+                  }}
+                  disabled={loadTemplateMutation.isPending}
+                  className="w-full"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Load This Template
                 </Button>
               </div>
             </div>
