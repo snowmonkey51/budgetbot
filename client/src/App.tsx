@@ -4,10 +4,11 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wallet } from "lucide-react";
+import { Wallet, Settings } from "lucide-react";
 import Budget from "@/pages/budget";
 import BudgetSecond from "@/pages/budget-second";
 import BudgetPlanning from "@/pages/budget-planning";
+import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
 function AppLayout({ children }: { children: React.ReactNode }) {
@@ -29,7 +30,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               
               {/* Navigation Tabs */}
               <Tabs value={location} className="w-auto">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="/" asChild>
                     <Link href="/">First Half (1-15)</Link>
                   </TabsTrigger>
@@ -38,6 +39,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                   </TabsTrigger>
                   <TabsTrigger value="/planning" asChild>
                     <Link href="/planning">Planning</Link>
+                  </TabsTrigger>
+                  <TabsTrigger value="/settings" asChild>
+                    <Link href="/settings" className="flex items-center gap-1">
+                      <Settings className="h-3 w-3" />
+                      Settings
+                    </Link>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -74,6 +81,11 @@ function Router() {
       <Route path="/planning">
         <AppLayout>
           <BudgetPlanning />
+        </AppLayout>
+      </Route>
+      <Route path="/settings">
+        <AppLayout>
+          <SettingsPage />
         </AppLayout>
       </Route>
       <Route component={NotFound} />
