@@ -36,7 +36,7 @@ export default function BudgetPlanning() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ExpenseForm period="planning" />
+            <ExpenseFormPlanning />
           </CardContent>
         </Card>
 
@@ -46,8 +46,8 @@ export default function BudgetPlanning() {
             <CardTitle className="text-base font-medium">Template Management</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <QuickTemplate period="planning" />
-            <TemplateLoader period="planning" />
+            <QuickTemplate period="first-half" />
+            <TemplateLoader period="first-half" />
           </CardContent>
         </Card>
 
@@ -64,7 +64,7 @@ export default function BudgetPlanning() {
 
       {/* Middle Column - Expense List */}
       <div className="lg:col-span-1">
-        <ExpenseList period="planning" />
+        <ExpenseListPlanning />
       </div>
 
       {/* Right Column - Analytics */}
@@ -77,7 +77,7 @@ export default function BudgetPlanning() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <SpendingChart period="planning" />
+            <SpendingChartPlanning />
           </CardContent>
         </Card>
       </div>

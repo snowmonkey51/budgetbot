@@ -423,7 +423,7 @@ export function ExpenseListPlanning() {
                     </div>
                     <div className="flex items-center space-x-2 ml-4">
                       <Switch
-                        checked={expense.cleared}
+                        checked={Boolean(expense.cleared)}
                         onCheckedChange={() => toggleClearedMutation.mutate(expense.id)}
                         disabled={toggleClearedMutation.isPending}
                       />
