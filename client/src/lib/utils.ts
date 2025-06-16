@@ -59,3 +59,13 @@ export const categoryColors: Record<string, string> = {
   health: 'bg-pink-500',
   other: 'bg-gray-500',
 };
+
+export const categoryBackgroundColors: Record<string, string> = {
+  food: 'bg-orange-50 hover:bg-orange-100',
+  transport: 'bg-blue-50 hover:bg-blue-100',
+  shopping: 'bg-green-50 hover:bg-green-100',
+  bills: 'bg-purple-50 hover:bg-purple-100',
+  entertainment: 'bg-red-50 hover:bg-red-100',
+  health: 'bg-pink-50 hover:bg-pink-100',
+  other: 'bg-gray-50 hover:bg-gray-100',
+};

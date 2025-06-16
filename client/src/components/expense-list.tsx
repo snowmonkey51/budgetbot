@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, categoryBackgroundColors } from "@/lib/utils";
 import { Edit, Trash2, Check, X, Receipt, Calendar } from "lucide-react";
 import type { Expense, Balance, Category } from "@shared/schema";
 
@@ -178,7 +178,7 @@ export function ExpenseList() {
         <div className="divide-y divide-slate-100">
           {expenses && expenses.length > 0 ? (
             expenses.map((expense) => (
-              <div key={expense.id} className="p-4 hover:bg-slate-50 transition-colors">
+              <div key={expense.id} className={`p-4 transition-colors ${categoryBackgroundColors[expense.category.toLowerCase()] || 'bg-gray-50 hover:bg-gray-100'}`}>
                 {editingId === expense.id ? (
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
