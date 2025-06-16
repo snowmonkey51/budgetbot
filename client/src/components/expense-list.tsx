@@ -332,19 +332,19 @@ export function ExpenseList() {
                   </div>
                 ) : (
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-10 h-10 ${getCategoryByName(expense.category)?.color || 'bg-gray-100'} rounded-lg flex items-center justify-center`}>
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
+                      <div className={`w-10 h-10 ${getCategoryByName(expense.category)?.color || 'bg-gray-100'} rounded-lg flex items-center justify-center flex-shrink-0`}>
                         <span className="text-lg">{getCategoryByName(expense.category)?.icon || '📋'}</span>
                       </div>
-                      <div>
-                        <h3 className="font-medium text-slate-900">{expense.description}</h3>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-medium text-slate-900 truncate">{expense.description}</h3>
                         {expense.notes && (
-                          <p className="text-xs text-slate-400 mt-1">"{expense.notes}"</p>
+                          <p className="text-xs text-slate-400 mt-1 truncate">"{expense.notes}"</p>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-3 flex-shrink-0">
+                      <div className="flex items-center space-x-2 w-20 justify-end">
                         <span className="text-xs text-slate-500">Cleared</span>
                         <Switch
                           checked={expense.cleared || false}
@@ -352,8 +352,8 @@ export function ExpenseList() {
                           disabled={toggleClearedMutation.isPending}
                         />
                       </div>
-                      <span className="font-semibold text-slate-900">-{formatCurrency(expense.amount)}</span>
-                      <div className="flex space-x-1">
+                      <span className="font-semibold text-slate-900 w-20 text-right">-{formatCurrency(expense.amount)}</span>
+                      <div className="flex space-x-1 flex-shrink-0">
                         <Button
                           variant="ghost"
                           size="sm"
