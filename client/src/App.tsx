@@ -30,18 +30,34 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               
               {/* Navigation Tabs */}
               <Tabs value={location} className="w-auto">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="/" asChild>
-                    <Link href="/">First Half (1-15)</Link>
+                <TabsList className="grid w-full grid-cols-4 h-10 p-1 bg-slate-100 rounded-lg">
+                  <TabsTrigger 
+                    value="/" 
+                    asChild
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium px-3 py-2 rounded-md"
+                  >
+                    <Link href="/" className="flex items-center justify-center">First Half (1-15)</Link>
                   </TabsTrigger>
-                  <TabsTrigger value="/second-half" asChild>
-                    <Link href="/second-half">Second Half (16-31)</Link>
+                  <TabsTrigger 
+                    value="/second-half" 
+                    asChild
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium px-3 py-2 rounded-md"
+                  >
+                    <Link href="/second-half" className="flex items-center justify-center">Second Half (16-31)</Link>
                   </TabsTrigger>
-                  <TabsTrigger value="/planning" asChild>
-                    <Link href="/planning">Planning</Link>
+                  <TabsTrigger 
+                    value="/planning" 
+                    asChild
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium px-3 py-2 rounded-md"
+                  >
+                    <Link href="/planning" className="flex items-center justify-center">Planning</Link>
                   </TabsTrigger>
-                  <TabsTrigger value="/settings" asChild>
-                    <Link href="/settings" className="flex items-center gap-1">
+                  <TabsTrigger 
+                    value="/settings" 
+                    asChild
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium px-3 py-2 rounded-md"
+                  >
+                    <Link href="/settings" className="flex items-center justify-center gap-1">
                       <Settings className="h-3 w-3" />
                       Settings
                     </Link>
