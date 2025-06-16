@@ -25,9 +25,9 @@ export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps
   const { toast } = useToast();
 
   const { data: templates = [], isLoading } = useQuery({
-    queryKey: ["/api/templates", period],
+    queryKey: ["/api/templates"],
     queryFn: async () => {
-      const response = await fetch(`/api/templates?period=${period}`);
+      const response = await fetch(`/api/templates`);
       return response.json();
     }
   });
