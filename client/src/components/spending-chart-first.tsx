@@ -26,17 +26,12 @@ export function SpendingChartFirst() {
   const getChartData = () => {
     if (!expenses || !categories) return [];
 
-    console.log('First Half Chart - Raw expenses:', expenses);
-    console.log('First Half Chart - Categories:', categories);
-
     const spendingByCategory = expenses
       .filter(expense => !expense.cleared)
       .reduce((acc, expense) => {
         const category = categories.find(cat => cat.name.toLowerCase() === expense.category.toLowerCase());
         const categoryName = category?.name || expense.category;
         const amount = parseFloat(expense.amount);
-        
-        console.log(`Processing expense: ${expense.description} - ${expense.category} -> ${categoryName} - $${amount}`);
         
         if (!acc[categoryName]) {
           acc[categoryName] = {
@@ -49,8 +44,6 @@ export function SpendingChartFirst() {
         acc[categoryName].value += amount;
         return acc;
       }, {} as Record<string, { name: string; value: number; color: string; icon: string }>);
-
-    console.log('First Half Chart - Final category totals:', spendingByCategory);
 
     return Object.values(spendingByCategory)
       .filter(item => item.value > 0)
@@ -114,15 +107,18 @@ export function SpendingChartFirst() {
   }
 
   const totalAmount = chartData.reduce((sum, item) => sum + item.value, 0);
-  console.log('First Half Chart - Chart data:', chartData);
-  console.log('First Half Chart - Total amount:', totalAmount);
 
   return (
     <Card>
       <CardContent className="p-6">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">
-          Spending Breakdown
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-900">
+            Spending Breakdown
+          </h3>
+          <span className="text-sm text-slate-600">
+            Total: <span className="font-medium text-slate-900">{formatCurrency(totalAmount)}</span>
+          </span>
+        </div>
         
         <div className="h-48 mb-4">
           <ResponsiveContainer width="100%" height="100%">
