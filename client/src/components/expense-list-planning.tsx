@@ -271,84 +271,6 @@ export function ExpenseListPlanning() {
 
   return (
     <div className="space-y-6">
-      {/* Spendable Balance Card */}
-      <div className="rounded-xl shadow-lg relative overflow-hidden h-40">
-        {/* Dynamic background based on spending ratio */}
-        <div 
-          className="absolute inset-0 transition-all duration-700 ease-in-out"
-          style={{
-            background: (() => {
-              if (!balance) return 'linear-gradient(135deg, #059669, #047857, #065f46)';
-              
-              const currentBalance = parseFloat(balance.amount);
-              const spentRatio = totalExpenses / currentBalance;
-              
-              if (spentRatio <= 0.3) {
-                // Bright green when less than 30% spent
-                return 'linear-gradient(135deg, #10b981, #059669, #047857)';
-              } else if (spentRatio <= 0.5) {
-                // Green-yellow when 30-50% spent
-                return 'linear-gradient(135deg, #84cc16, #65a30d, #4d7c0f)';
-              } else if (spentRatio <= 0.7) {
-                // Yellow-orange when 50-70% spent  
-                return 'linear-gradient(135deg, #f59e0b, #d97706, #b45309)';
-              } else if (spentRatio <= 0.85) {
-                // Orange when 70-85% spent
-                return 'linear-gradient(135deg, #f97316, #ea580c, #c2410c)';
-              } else if (spentRatio <= 0.95) {
-                // Red-orange when 85-95% spent
-                return 'linear-gradient(135deg, #ef4444, #dc2626, #b91c1c)';
-              } else {
-                // Bright red when over 95%
-                return 'linear-gradient(135deg, #dc2626, #b91c1c, #991b1b)';
-              }
-            })()
-          }}
-        />
-        
-        {/* Animated dots pattern overlay */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-4 left-8 w-2 h-2 bg-white rounded-full animate-pulse"></div>
-          <div className="absolute top-12 left-16 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute top-20 left-6 w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute bottom-8 right-12 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-          <div className="absolute bottom-16 right-20 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
-        </div>
-        
-        {/* Spending percentage indicator */}
-        <div className="absolute top-3 left-4">
-          <div className="bg-black bg-opacity-30 rounded-lg px-2.5 py-1.5">
-            <div className="text-white text-xl font-bold flex items-center gap-1">
-              {balance ? Math.round((totalExpenses / parseFloat(balance.amount)) * 100) : 0}%
-              {balance && (totalExpenses / parseFloat(balance.amount)) > 0.8 && (
-                <svg className="w-4 h-4 text-yellow-300 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              )}
-            </div>
-            <div className="text-white text-xs opacity-90">USED</div>
-          </div>
-        </div>
-        
-        <div className="absolute top-3 right-4 text-right z-10 max-w-48">
-          <h3 className="text-xs font-medium text-white text-opacity-90 mb-1">Spendable Balance</h3>
-          <div className="text-2xl font-bold text-white drop-shadow-lg">
-            {formatCurrency(spendableBalance)}
-          </div>
-          <p className="text-xs text-white text-opacity-90 mt-1 leading-tight">
-            After {formatCurrency(totalExpenses)} in expenses
-            {balance && (
-              <span className="block text-xs mt-0.5 opacity-80">
-                {formatCurrency(parseFloat(balance.amount) - totalExpenses)} remaining
-              </span>
-            )}
-          </p>
-        </div>
-        
-        {/* Glowing bottom edge */}
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"></div>
-      </div>
-
       <Card>
         <CardContent className="p-6 border-b border-slate-200">
           <div className="flex items-center justify-between">
@@ -534,6 +456,84 @@ export function ExpenseListPlanning() {
           )}
         </div>
       </Card>
+
+      {/* Spendable Balance Card */}
+      <div className="rounded-xl shadow-lg relative overflow-hidden h-40">
+        {/* Dynamic background based on spending ratio */}
+        <div 
+          className="absolute inset-0 transition-all duration-700 ease-in-out"
+          style={{
+            background: (() => {
+              if (!balance) return 'linear-gradient(135deg, #059669, #047857, #065f46)';
+              
+              const currentBalance = parseFloat(balance.amount);
+              const spentRatio = totalExpenses / currentBalance;
+              
+              if (spentRatio <= 0.3) {
+                // Bright green when less than 30% spent
+                return 'linear-gradient(135deg, #10b981, #059669, #047857)';
+              } else if (spentRatio <= 0.5) {
+                // Green-yellow when 30-50% spent
+                return 'linear-gradient(135deg, #84cc16, #65a30d, #4d7c0f)';
+              } else if (spentRatio <= 0.7) {
+                // Yellow-orange when 50-70% spent  
+                return 'linear-gradient(135deg, #f59e0b, #d97706, #b45309)';
+              } else if (spentRatio <= 0.85) {
+                // Orange when 70-85% spent
+                return 'linear-gradient(135deg, #f97316, #ea580c, #c2410c)';
+              } else if (spentRatio <= 0.95) {
+                // Red-orange when 85-95% spent
+                return 'linear-gradient(135deg, #ef4444, #dc2626, #b91c1c)';
+              } else {
+                // Bright red when over 95%
+                return 'linear-gradient(135deg, #dc2626, #b91c1c, #991b1b)';
+              }
+            })()
+          }}
+        />
+        
+        {/* Animated dots pattern overlay */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-4 left-8 w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          <div className="absolute top-12 left-16 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute top-20 left-6 w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-8 right-12 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute bottom-16 right-20 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+        
+        {/* Spending percentage indicator */}
+        <div className="absolute top-3 left-4">
+          <div className="bg-black bg-opacity-30 rounded-lg px-2.5 py-1.5">
+            <div className="text-white text-xl font-bold flex items-center gap-1">
+              {balance ? Math.round((totalExpenses / parseFloat(balance.amount)) * 100) : 0}%
+              {balance && (totalExpenses / parseFloat(balance.amount)) > 0.8 && (
+                <svg className="w-4 h-4 text-yellow-300 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
+            <div className="text-white text-xs opacity-90">USED</div>
+          </div>
+        </div>
+        
+        <div className="absolute top-3 right-4 text-right z-10 max-w-48">
+          <h3 className="text-xs font-medium text-white text-opacity-90 mb-1">Spendable Balance</h3>
+          <div className="text-2xl font-bold text-white drop-shadow-lg">
+            {formatCurrency(spendableBalance)}
+          </div>
+          <p className="text-xs text-white text-opacity-90 mt-1 leading-tight">
+            After {formatCurrency(totalExpenses)} in expenses
+            {balance && (
+              <span className="block text-xs mt-0.5 opacity-80">
+                {formatCurrency(parseFloat(balance.amount) - totalExpenses)} remaining
+              </span>
+            )}
+          </p>
+        </div>
+        
+        {/* Glowing bottom edge */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"></div>
+      </div>
     </div>
   );
 }
