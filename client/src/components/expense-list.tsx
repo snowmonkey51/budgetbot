@@ -283,11 +283,10 @@ export function ExpenseList() {
               </span>
               {expenses && expenses.length > 0 && (
                 <Button
-                  variant="outline"
                   size="sm"
                   onClick={() => clearAllMutation.mutate()}
                   disabled={clearAllMutation.isPending}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="bg-red-600 hover:bg-red-700 text-white"
                 >
                   <Eraser className="w-4 h-4 mr-1" />
                   Clear All
