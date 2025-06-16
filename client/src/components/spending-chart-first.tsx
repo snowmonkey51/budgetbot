@@ -36,8 +36,19 @@ export function SpendingChartFirst() {
   const getChartData = () => {
     if (!expenses || !categories) return [];
 
-    const spendingByCategory = expenses
-      .filter(expense => !expense.cleared)
+    // Debug logging to see what data we're working with
+    console.log('First Half Chart Expenses:', expenses);
+    console.log('First Half Chart - Expense count:', expenses.length);
+    
+    // Double filter by period to ensure we only get first-half expenses
+    const firstHalfExpenses = expenses.filter(expense => 
+      expense.period === 'first-half' && !expense.cleared
+    );
+    
+    console.log('Filtered First Half Expenses:', firstHalfExpenses);
+    console.log('Filtered count:', firstHalfExpenses.length);
+
+    const spendingByCategory = firstHalfExpenses
       .reduce((acc, expense) => {
         const category = categories.find(cat => cat.name.toLowerCase() === expense.category.toLowerCase());
         const categoryName = category?.name || expense.category;
@@ -55,9 +66,15 @@ export function SpendingChartFirst() {
         return acc;
       }, {} as Record<string, { name: string; value: number; color: string; icon: string }>);
 
-    return Object.values(spendingByCategory)
+    const result = Object.values(spendingByCategory)
       .filter(item => item.value > 0)
       .sort((a, b) => b.value - a.value);
+    
+    console.log('First Half Chart Data:', result);
+    const total = result.reduce((sum, item) => sum + item.value, 0);
+    console.log('First Half Chart Total:', total);
+    
+    return result;
   };
 
   const chartData = getChartData();
