@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wallet, Settings } from "lucide-react";
+import { useState } from "react";
+import { Calculator } from "@/components/calculator";
 import Budget from "@/pages/budget";
 import BudgetSecond from "@/pages/budget-second";
 import BudgetPlanning from "@/pages/budget-planning";
@@ -13,6 +15,7 @@ import NotFound from "@/pages/not-found";
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   
   return (
     <div className="min-h-screen bg-slate-50">
@@ -66,8 +69,19 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               </Tabs>
             </div>
             
-            <div className="text-sm text-slate-500">
-              Last updated: <span>Just now</span>
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-slate-500">
+                Last updated: <span>Just now</span>
+              </div>
+              <button
+                onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
+                className="p-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 shadow-sm transition-all duration-200 hover:shadow-md"
+                title="Calculator"
+              >
+                <svg className="h-4 w-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -77,6 +91,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
+
+      {/* Calculator Component */}
+      <Calculator 
+        isOpen={isCalculatorOpen} 
+        onToggle={() => setIsCalculatorOpen(!isCalculatorOpen)} 
+      />
     </div>
   );
 }
