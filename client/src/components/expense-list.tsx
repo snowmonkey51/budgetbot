@@ -292,13 +292,7 @@ export function ExpenseList() {
       </Card>
 
       {/* Spendable Balance Card */}
-      <div className={`rounded-xl shadow-lg p-6 text-white ${
-        spendableBalance < 0 
-          ? 'bg-gradient-to-r from-red-500 to-red-600' 
-          : spendableBalance < 500 
-            ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' 
-            : 'bg-gradient-to-r from-blue-600 to-blue-700'
-      }`}>
+      <div className="rounded-xl shadow-lg p-6 text-white bg-gradient-to-r from-green-600 to-green-700">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-opacity-90">Spendable Balance</h3>
           <div className="text-opacity-75">💰</div>
