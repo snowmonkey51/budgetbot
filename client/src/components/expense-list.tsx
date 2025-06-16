@@ -390,16 +390,60 @@ export function ExpenseList() {
       </Card>
 
       {/* Spendable Balance Card */}
-      <div className="rounded-xl shadow-lg p-6 text-white bg-gradient-to-r from-green-600 to-green-700">
-        <div className="flex items-center justify-end mb-2">
-          <h3 className="text-sm font-medium text-opacity-90">Spendable Balance</h3>
+      <div className="rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
+        {/* Dynamic background based on spending ratio */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-r transition-all duration-500"
+          style={{
+            background: (() => {
+              if (!balance) return 'linear-gradient(to right, #16a34a, #15803d)';
+              
+              const currentBalance = parseFloat(balance.amount);
+              const spentRatio = totalExpenses / currentBalance;
+              
+              if (spentRatio <= 0.5) {
+                // Green when less than 50% spent
+                return 'linear-gradient(to right, #16a34a, #15803d)';
+              } else if (spentRatio <= 0.75) {
+                // Yellow/orange when 50-75% spent
+                return 'linear-gradient(to right, #d97706, #c2410c)';
+              } else if (spentRatio <= 0.9) {
+                // Orange/red when 75-90% spent
+                return 'linear-gradient(to right, #ea580c, #dc2626)';
+              } else {
+                // Red when over 90% spent
+                return 'linear-gradient(to right, #dc2626, #b91c1c)';
+              }
+            })()
+          }}
+        />
+        
+        {/* Progress bar overlay */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black bg-opacity-20">
+          <div 
+            className="h-full bg-white bg-opacity-40 transition-all duration-500"
+            style={{
+              width: balance ? `${Math.min((totalExpenses / parseFloat(balance.amount)) * 100, 100)}%` : '0%'
+            }}
+          />
         </div>
-        <div className="text-3xl font-bold text-right">
-          {formatCurrency(spendableBalance)}
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-end mb-2">
+            <h3 className="text-sm font-medium text-opacity-90">Spendable Balance</h3>
+          </div>
+          <div className="text-3xl font-bold text-right">
+            {formatCurrency(spendableBalance)}
+          </div>
+          <p className="text-sm text-opacity-90 mt-1 text-right">
+            After {formatCurrency(totalExpenses)} in expenses
+            {balance && (
+              <span className="block">
+                {Math.round((totalExpenses / parseFloat(balance.amount)) * 100)}% of budget used
+              </span>
+            )}
+          </p>
         </div>
-        <p className="text-sm text-opacity-90 mt-1 text-right">
-          After {formatCurrency(totalExpenses)} in expenses
-        </p>
       </div>
     </div>
   );
