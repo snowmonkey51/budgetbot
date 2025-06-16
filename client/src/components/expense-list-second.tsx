@@ -377,7 +377,7 @@ export function ExpenseListSecond() {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
-                      <div className={`w-10 h-10 ${getCategoryByName(expense.category)?.color || 'bg-gray-100'} rounded-lg flex items-center justify-center flex-shrink-0 shadow-inner`}>
+                      <div className={`w-10 h-10 ${getCategoryByName(expense.category)?.color || 'bg-gray-100'} rounded-lg flex items-center justify-center flex-shrink-0`} style={{ boxShadow: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.15)' }}>
                         <span className="text-lg">{getCategoryByName(expense.category)?.icon || '📋'}</span>
                       </div>
                       <div className="min-w-0 flex-1">
