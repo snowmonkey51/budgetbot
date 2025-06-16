@@ -1,7 +1,7 @@
 import { BalanceForm } from "@/components/balance-form";
 import { ExpenseForm } from "@/components/expense-form";
 import { ExpenseList } from "@/components/expense-list";
-import { SpendingChart } from "@/components/spending-chart";
+import { SpendingChartFirst } from "@/components/spending-chart-first";
 import { QuickTemplate } from "@/components/quick-template";
 import { TemplateLoader } from "@/components/template-loader";
 import { Wallet } from "lucide-react";
@@ -17,7 +17,7 @@ export default function Budget() {
           <QuickTemplate period="first-half" />
           <TemplateLoader period="first-half" />
         </div>
-
+        <SpendingChartFirst />
       </div>
 
       {/* Right Panel */}
