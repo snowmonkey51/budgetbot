@@ -13,7 +13,7 @@ import type { Category, InsertCategory } from "@shared/schema";
 
 const emojiOptions = [
   "🍽️", "🚗", "🛒", "💳", "🎬", "🏥", "📋", "🏠", "✈️", "🎓",
-  "👔", "🎮", "📱", "⚽", "🎵", "📚", "🔧", "💡", "🎨", "☕"
+  "👔", "🎮", "📱", "⚽", "🎵", "📚", "🔧", "💡", "🎨", "☕", "🐱"
 ];
 
 const colorOptions = [
