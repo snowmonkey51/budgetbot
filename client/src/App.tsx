@@ -34,30 +34,30 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                   <TabsTrigger 
                     value="/" 
                     asChild
-                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium px-3 py-2 rounded-md"
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium rounded-md h-8 px-2"
                   >
-                    <Link href="/" className="flex items-center justify-center">First Half (1-15)</Link>
+                    <Link href="/" className="flex items-center justify-center h-full w-full">First Half (1-15)</Link>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="/second-half" 
                     asChild
-                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium px-3 py-2 rounded-md"
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium rounded-md h-8 px-2"
                   >
-                    <Link href="/second-half" className="flex items-center justify-center">Second Half (16-31)</Link>
+                    <Link href="/second-half" className="flex items-center justify-center h-full w-full">Second Half (16-31)</Link>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="/planning" 
                     asChild
-                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium px-3 py-2 rounded-md"
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium rounded-md h-8 px-2"
                   >
-                    <Link href="/planning" className="flex items-center justify-center">Planning</Link>
+                    <Link href="/planning" className="flex items-center justify-center h-full w-full">Planning</Link>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="/settings" 
                     asChild
-                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium px-3 py-2 rounded-md"
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all duration-200 text-sm font-medium rounded-md h-8 px-2"
                   >
-                    <Link href="/settings" className="flex items-center justify-center gap-1">
+                    <Link href="/settings" className="flex items-center justify-center h-full w-full gap-1">
                       <Settings className="h-3 w-3" />
                       Settings
                     </Link>
