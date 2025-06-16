@@ -14,7 +14,7 @@ export interface IStorage {
   deleteCategory(id: number): Promise<boolean>;
   
   // Expense operations
-  getExpenses(): Promise<Expense[]>;
+  getExpenses(period?: string): Promise<Expense[]>;
   createExpense(expense: InsertExpense): Promise<Expense>;
   updateExpense(id: number, expense: Partial<InsertExpense>): Promise<Expense | undefined>;
   deleteExpense(id: number): Promise<boolean>;
@@ -76,11 +76,16 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
-  async getExpenses(): Promise<Expense[]> {
-    return await db
-      .select()
-      .from(expenses)
-      .orderBy(expenses.createdAt);
+  async getExpenses(period?: string): Promise<Expense[]> {
+    const query = db.select().from(expenses);
+    
+    if (period) {
+      return await query
+        .where(eq(expenses.period, period))
+        .orderBy(expenses.createdAt);
+    }
+    
+    return await query.orderBy(expenses.createdAt);
   }
 
   async createExpense(insertExpense: InsertExpense): Promise<Expense> {
@@ -204,8 +209,16 @@ export class MemStorage implements IStorage {
     return this.categories.delete(id);
   }
 
-  async getExpenses(): Promise<Expense[]> {
-    return Array.from(this.expenses.values()).sort(
+  async getExpenses(period?: string): Promise<Expense[]> {
+    const allExpenses = Array.from(this.expenses.values());
+    
+    if (period) {
+      return allExpenses
+        .filter(expense => expense.period === period)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+    
+    return allExpenses.sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
     );
   }
@@ -219,6 +232,7 @@ export class MemStorage implements IStorage {
       category: insertExpense.category,
       notes: insertExpense.notes ?? null,
       cleared: false,
+      period: insertExpense.period || "first-half",
       createdAt: new Date()
     };
     this.expenses.set(id, expense);

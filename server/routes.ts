@@ -99,10 +99,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all expenses
+  // Get all expenses (with optional period filter)
   app.get("/api/expenses", async (req, res) => {
     try {
-      const expenses = await storage.getExpenses();
+      const period = req.query.period as string | undefined;
+      const expenses = await storage.getExpenses(period);
       res.json(expenses);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch expenses" });

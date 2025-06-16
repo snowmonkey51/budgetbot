@@ -23,6 +23,7 @@ export const expenses = pgTable("expenses", {
   category: text("category").notNull(),
   notes: text("notes"),
   cleared: boolean("cleared").default(false),
+  period: text("period").notNull().default("first-half"), // "first-half" or "second-half"
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
