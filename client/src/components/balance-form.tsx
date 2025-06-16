@@ -77,7 +77,7 @@ export function BalanceForm() {
   }
 
   return (
-    <Card>
+    <Card className="bg-blue-50 border-blue-200">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-slate-900">Current Balance</h2>
