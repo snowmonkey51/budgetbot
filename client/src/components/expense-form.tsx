@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus } from "lucide-react";
+import { CategoryManager } from "./category-manager";
+import { Plus, Settings } from "lucide-react";
 import type { InsertExpense, Category } from "@shared/schema";
 
 export function ExpenseForm() {
@@ -129,9 +131,24 @@ export function ExpenseForm() {
             </div>
 
             <div>
-              <Label htmlFor="expense-category" className="text-sm font-medium text-slate-700">
-                Category
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="expense-category" className="text-sm font-medium text-slate-700">
+                  Category
+                </Label>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="text-slate-400 hover:text-blue-600 p-1">
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Manage Categories</DialogTitle>
+                    </DialogHeader>
+                    <CategoryManager />
+                  </DialogContent>
+                </Dialog>
+              </div>
               <Select value={category} onValueChange={setCategory} required>
                 <SelectTrigger className="mt-2">
                   <SelectValue placeholder="Select..." />

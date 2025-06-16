@@ -156,28 +156,17 @@ export function CategoryManager() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Category Management</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-2">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-10 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="animate-pulse space-y-2">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-10 bg-gray-200 rounded"></div>
+        ))}
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="flex items-center gap-2">
-          <Settings className="h-5 w-5" />
-          Manage Categories
-        </CardTitle>
+    <div className="space-y-4">
+      <div className="flex justify-end">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" onClick={openCreateDialog}>
@@ -258,9 +247,9 @@ export function CategoryManager() {
             </form>
           </DialogContent>
         </Dialog>
-      </CardHeader>
+      </div>
 
-      <CardContent className="space-y-2">
+      <div className="space-y-2">
         {categories && categories.length > 0 ? (
           categories.map((category) => (
             <div
@@ -300,7 +289,7 @@ export function CategoryManager() {
             <p>No categories created yet.</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

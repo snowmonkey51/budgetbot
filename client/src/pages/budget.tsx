@@ -1,7 +1,6 @@
 import { BalanceForm } from "@/components/balance-form";
 import { ExpenseForm } from "@/components/expense-form";
 import { ExpenseList } from "@/components/expense-list";
-import { CategoryManager } from "@/components/category-manager";
 import { Wallet } from "lucide-react";
 
 export default function Budget() {
@@ -31,7 +30,6 @@ export default function Budget() {
           <div className="lg:col-span-1 space-y-6">
             <BalanceForm />
             <ExpenseForm />
-            <CategoryManager />
           </div>
 
           {/* Right Panel */}
