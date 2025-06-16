@@ -65,6 +65,7 @@ export const insertTemplateSchema = createInsertSchema(templates).omit({
 
 export const insertTemplateItemSchema = createInsertSchema(templateItems).omit({
   id: true,
+  templateId: true,
 });
 
 export type Balance = typeof balance.$inferSelect;
