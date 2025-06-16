@@ -7,12 +7,14 @@ import type { Expense, Category } from "@shared/schema";
 
 export function SpendingChartSecond() {
   const { data: expenses, isLoading: expensesLoading } = useQuery<Expense[]>({
-    queryKey: ["/api/expenses", "second-half"],
+    queryKey: ["/api/expenses", "second-half", "chart"],
     queryFn: async () => {
       const response = await fetch("/api/expenses?period=second-half");
       if (!response.ok) throw new Error("Failed to fetch expenses");
       return response.json();
     },
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const { data: categories } = useQuery<Category[]>({

@@ -1,18 +1,28 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { PieChart as PieChartIcon, TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { Expense, Category } from "@shared/schema";
+import { useEffect } from "react";
 
 export function SpendingChartFirst() {
+  const queryClient = useQueryClient();
+
+  // Force invalidate cache on mount
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+  }, [queryClient]);
+
   const { data: expenses, isLoading: expensesLoading } = useQuery<Expense[]>({
-    queryKey: ["/api/expenses", "first-half"],
+    queryKey: ["/api/expenses", "first-half", "chart"],
     queryFn: async () => {
       const response = await fetch("/api/expenses?period=first-half");
       if (!response.ok) throw new Error("Failed to fetch expenses");
       return response.json();
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const { data: categories } = useQuery<Category[]>({
