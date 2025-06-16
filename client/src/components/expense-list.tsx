@@ -390,7 +390,7 @@ export function ExpenseList() {
       </Card>
 
       {/* Spendable Balance Card */}
-      <div className="rounded-xl shadow-lg relative overflow-hidden h-32">
+      <div className="rounded-xl shadow-lg relative overflow-hidden h-40">
         {/* Dynamic background based on spending ratio */}
         <div 
           className="absolute inset-0 transition-all duration-700 ease-in-out"
@@ -445,16 +445,16 @@ export function ExpenseList() {
           </div>
         </div>
         
-        <div className="absolute top-3 right-4 text-right z-10">
-          <h3 className="text-sm font-medium text-white text-opacity-90 mb-1">Spendable Balance</h3>
-          <div className="text-3xl font-bold text-white drop-shadow-lg">
+        <div className="absolute top-3 right-4 text-right z-10 max-w-48">
+          <h3 className="text-xs font-medium text-white text-opacity-90 mb-1">Spendable Balance</h3>
+          <div className="text-2xl font-bold text-white drop-shadow-lg">
             {formatCurrency(spendableBalance)}
           </div>
-          <p className="text-sm text-white text-opacity-90 mt-1">
+          <p className="text-xs text-white text-opacity-90 mt-1 leading-tight">
             After {formatCurrency(totalExpenses)} in expenses
             {balance && (
-              <span className="block text-xs mt-1 opacity-80">
-                {formatCurrency(parseFloat(balance.amount) - totalExpenses)} remaining of {formatCurrency(parseFloat(balance.amount))}
+              <span className="block text-xs mt-0.5 opacity-80">
+                {formatCurrency(parseFloat(balance.amount) - totalExpenses)} remaining
               </span>
             )}
           </p>
