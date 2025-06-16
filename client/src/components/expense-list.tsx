@@ -178,7 +178,7 @@ export function ExpenseList() {
         <div className="divide-y divide-slate-100">
           {expenses && expenses.length > 0 ? (
             expenses.map((expense) => (
-              <div key={expense.id} className="p-4 hover:bg-slate-50 transition-colors">
+              <div key={expense.id} className={`p-4 transition-colors ${getCategoryByName(expense.category)?.color || 'bg-gray-50'} hover:opacity-80`}</div>
                 {editingId === expense.id ? (
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
