@@ -1,4 +1,6 @@
-import { Balance, Expense, Category, type InsertBalance, type InsertExpense, type InsertCategory } from "@shared/schema";
+import { Balance, Expense, Category, type InsertBalance, type InsertExpense, type InsertCategory, balance, expenses, categories } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // Balance operations
@@ -16,6 +18,94 @@ export interface IStorage {
   createExpense(expense: InsertExpense): Promise<Expense>;
   updateExpense(id: number, expense: Partial<InsertExpense>): Promise<Expense | undefined>;
   deleteExpense(id: number): Promise<boolean>;
+}
+
+export class DatabaseStorage implements IStorage {
+  async getCurrentBalance(): Promise<Balance | null> {
+    const [balanceRecord] = await db.select().from(balance).limit(1);
+    return balanceRecord || null;
+  }
+
+  async updateBalance(insertBalance: InsertBalance): Promise<Balance> {
+    // Check if balance record exists
+    const existing = await this.getCurrentBalance();
+    
+    if (existing) {
+      const [updated] = await db
+        .update(balance)
+        .set({ amount: insertBalance.amount, updatedAt: new Date() })
+        .where(eq(balance.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(balance)
+        .values(insertBalance)
+        .returning();
+      return created;
+    }
+  }
+
+  async getCategories(): Promise<Category[]> {
+    return await db.select().from(categories).orderBy(categories.name);
+  }
+
+  async createCategory(insertCategory: InsertCategory): Promise<Category> {
+    const [category] = await db
+      .insert(categories)
+      .values(insertCategory)
+      .returning();
+    return category;
+  }
+
+  async updateCategory(id: number, updates: Partial<InsertCategory>): Promise<Category | undefined> {
+    const [updated] = await db
+      .update(categories)
+      .set(updates)
+      .where(eq(categories.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    const result = await db
+      .delete(categories)
+      .where(eq(categories.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  async getExpenses(): Promise<Expense[]> {
+    return await db
+      .select()
+      .from(expenses)
+      .orderBy(expenses.createdAt);
+  }
+
+  async createExpense(insertExpense: InsertExpense): Promise<Expense> {
+    const [expense] = await db
+      .insert(expenses)
+      .values(insertExpense)
+      .returning();
+    return expense;
+  }
+
+  async updateExpense(id: number, updates: Partial<InsertExpense>): Promise<Expense | undefined> {
+    const [updated] = await db
+      .update(expenses)
+      .set(updates)
+      .where(eq(expenses.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteExpense(id: number): Promise<boolean> {
+    const result = await db
+      .delete(expenses)
+      .where(eq(expenses.id, id))
+      .returning();
+    return result.length > 0;
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -134,4 +224,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
