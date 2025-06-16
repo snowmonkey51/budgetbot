@@ -425,34 +425,34 @@ export function ExpenseList() {
         />
 
         {/* Large progress bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-3 bg-black bg-opacity-30">
+        <div className="absolute bottom-0 left-0 right-0 h-6 bg-black bg-opacity-30">
           <div 
             className="h-full bg-white transition-all duration-700 ease-out shadow-lg"
             style={{
               width: balance ? `${Math.min((totalExpenses / parseFloat(balance.amount)) * 100, 100)}%` : '0%',
-              boxShadow: '0 0 10px rgba(255,255,255,0.5)'
+              boxShadow: '0 0 15px rgba(255,255,255,0.6)'
             }}
           />
         </div>
 
         {/* Spending percentage indicator */}
-        <div className="absolute top-4 left-4">
-          <div className="bg-black bg-opacity-30 rounded-lg px-3 py-2">
-            <div className="text-white text-2xl font-bold">
+        <div className="absolute top-3 left-4">
+          <div className="bg-black bg-opacity-30 rounded-lg px-2.5 py-1.5">
+            <div className="text-white text-xl font-bold">
               {balance ? Math.round((totalExpenses / parseFloat(balance.amount)) * 100) : 0}%
             </div>
             <div className="text-white text-xs opacity-90">USED</div>
           </div>
         </div>
         
-        <div className="relative z-10 p-6 pt-20">
+        <div className="relative z-10 p-4 pt-16">
           <div className="flex items-center justify-end mb-2">
             <h3 className="text-sm font-medium text-white text-opacity-90">Spendable Balance</h3>
           </div>
-          <div className="text-4xl font-bold text-right text-white drop-shadow-lg">
+          <div className="text-3xl font-bold text-right text-white drop-shadow-lg">
             {formatCurrency(spendableBalance)}
           </div>
-          <p className="text-sm text-white text-opacity-90 mt-2 text-right">
+          <p className="text-sm text-white text-opacity-90 mt-1 text-right">
             After {formatCurrency(totalExpenses)} in expenses
             {balance && (
               <span className="block text-xs mt-1 opacity-80">
@@ -464,9 +464,9 @@ export function ExpenseList() {
 
         {/* Warning indicator for high spending */}
         {balance && (totalExpenses / parseFloat(balance.amount)) > 0.8 && (
-          <div className="absolute top-4 right-4 animate-pulse">
-            <div className="bg-white bg-opacity-20 rounded-full p-2">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <div className="absolute top-3 right-4 animate-pulse">
+            <div className="bg-white bg-opacity-20 rounded-full p-1.5">
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
             </div>
