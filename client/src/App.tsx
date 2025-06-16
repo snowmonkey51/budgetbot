@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wallet } from "lucide-react";
 import Budget from "@/pages/budget";
 import BudgetSecond from "@/pages/budget-second";
+import BudgetPlanning from "@/pages/budget-planning";
 import NotFound from "@/pages/not-found";
 
 function AppLayout({ children }: { children: React.ReactNode }) {
@@ -28,12 +29,15 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               
               {/* Navigation Tabs */}
               <Tabs value={location} className="w-auto">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="/" asChild>
                     <Link href="/">First Half (1-15)</Link>
                   </TabsTrigger>
                   <TabsTrigger value="/second-half" asChild>
                     <Link href="/second-half">Second Half (16-31)</Link>
+                  </TabsTrigger>
+                  <TabsTrigger value="/planning" asChild>
+                    <Link href="/planning">Planning</Link>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -65,6 +69,11 @@ function Router() {
       <Route path="/second-half">
         <AppLayout>
           <BudgetSecond />
+        </AppLayout>
+      </Route>
+      <Route path="/planning">
+        <AppLayout>
+          <BudgetPlanning />
         </AppLayout>
       </Route>
       <Route component={NotFound} />
