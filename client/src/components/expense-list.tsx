@@ -165,7 +165,7 @@ export function ExpenseList() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              1-15 Expenses
+              1st-15th Expenses
             </h2>
             <div className="flex items-center space-x-3">
               <span className="text-sm text-slate-500">
