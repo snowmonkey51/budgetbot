@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { formatCurrency, formatDate, categoryIcons, categoryColors } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { Edit, Trash2, Check, X, Receipt } from "lucide-react";
-import type { Expense, Balance } from "@shared/schema";
+import type { Expense, Balance, Category } from "@shared/schema";
 
 export function ExpenseList() {
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -24,6 +24,10 @@ export function ExpenseList() {
 
   const { data: balance } = useQuery<Balance | null>({
     queryKey: ["/api/balance"],
+  });
+
+  const { data: categories } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
   });
 
   const updateExpenseMutation = useMutation({

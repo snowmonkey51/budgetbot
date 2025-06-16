@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { categoryIcons } from "@/lib/utils";
 import { Plus } from "lucide-react";
-import type { InsertExpense } from "@shared/schema";
+import type { InsertExpense, Category } from "@shared/schema";
 
 export function ExpenseForm() {
   const [description, setDescription] = useState("");
@@ -17,6 +16,10 @@ export function ExpenseForm() {
   const [category, setCategory] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const { data: categories } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+  });
 
   const createExpenseMutation = useMutation({
     mutationFn: async (expense: InsertExpense) => {
@@ -133,13 +136,14 @@ export function ExpenseForm() {
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="food">{categoryIcons.food} Food</SelectItem>
-                  <SelectItem value="transport">{categoryIcons.transport} Transport</SelectItem>
-                  <SelectItem value="shopping">{categoryIcons.shopping} Shopping</SelectItem>
-                  <SelectItem value="bills">{categoryIcons.bills} Bills</SelectItem>
-                  <SelectItem value="entertainment">{categoryIcons.entertainment} Entertainment</SelectItem>
-                  <SelectItem value="health">{categoryIcons.health} Health</SelectItem>
-                  <SelectItem value="other">{categoryIcons.other} Other</SelectItem>
+                  {categories && categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.name.toLowerCase()}>
+                      <div className="flex items-center gap-2">
+                        <span>{cat.icon}</span>
+                        <span>{cat.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

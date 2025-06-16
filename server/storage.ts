@@ -1,9 +1,15 @@
-import { Balance, Expense, type InsertBalance, type InsertExpense } from "@shared/schema";
+import { Balance, Expense, Category, type InsertBalance, type InsertExpense, type InsertCategory } from "@shared/schema";
 
 export interface IStorage {
   // Balance operations
   getCurrentBalance(): Promise<Balance | null>;
   updateBalance(balance: InsertBalance): Promise<Balance>;
+  
+  // Category operations
+  getCategories(): Promise<Category[]>;
+  createCategory(category: InsertCategory): Promise<Category>;
+  updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category | undefined>;
+  deleteCategory(id: number): Promise<boolean>;
   
   // Expense operations
   getExpenses(): Promise<Expense[]>;
@@ -14,7 +20,9 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   private balance: Balance | null = null;
+  private categories: Map<number, Category> = new Map();
   private expenses: Map<number, Expense> = new Map();
+  private currentCategoryId: number = 1;
   private currentExpenseId: number = 1;
 
   constructor() {
@@ -24,6 +32,28 @@ export class MemStorage implements IStorage {
       amount: "0.00",
       updatedAt: new Date()
     };
+
+    // Initialize with default categories
+    const defaultCategories = [
+      { name: "Food", icon: "🍽️", color: "bg-orange-100" },
+      { name: "Transport", icon: "🚗", color: "bg-blue-100" },
+      { name: "Shopping", icon: "🛒", color: "bg-green-100" },
+      { name: "Bills", icon: "💳", color: "bg-purple-100" },
+      { name: "Entertainment", icon: "🎬", color: "bg-red-100" },
+      { name: "Health", icon: "🏥", color: "bg-pink-100" },
+      { name: "Other", icon: "📋", color: "bg-gray-100" },
+    ];
+
+    defaultCategories.forEach((cat) => {
+      const category: Category = {
+        id: this.currentCategoryId++,
+        name: cat.name,
+        icon: cat.icon,
+        color: cat.color,
+        createdAt: new Date()
+      };
+      this.categories.set(category.id, category);
+    });
   }
 
   async getCurrentBalance(): Promise<Balance | null> {
@@ -37,6 +67,37 @@ export class MemStorage implements IStorage {
       updatedAt: new Date()
     };
     return this.balance;
+  }
+
+  async getCategories(): Promise<Category[]> {
+    return Array.from(this.categories.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async createCategory(insertCategory: InsertCategory): Promise<Category> {
+    const id = this.currentCategoryId++;
+    const category: Category = {
+      ...insertCategory,
+      id,
+      createdAt: new Date()
+    };
+    this.categories.set(id, category);
+    return category;
+  }
+
+  async updateCategory(id: number, updates: Partial<InsertCategory>): Promise<Category | undefined> {
+    const existing = this.categories.get(id);
+    if (!existing) return undefined;
+
+    const updated: Category = {
+      ...existing,
+      ...updates
+    };
+    this.categories.set(id, updated);
+    return updated;
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    return this.categories.delete(id);
   }
 
   async getExpenses(): Promise<Expense[]> {

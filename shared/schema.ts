@@ -8,6 +8,14 @@ export const balance = pgTable("balance", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const categories = pgTable("categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  icon: text("icon").notNull(),
+  color: text("color").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const expenses = pgTable("expenses", {
   id: serial("id").primaryKey(),
   description: text("description").notNull(),
@@ -21,6 +29,11 @@ export const insertBalanceSchema = createInsertSchema(balance).omit({
   updatedAt: true,
 });
 
+export const insertCategorySchema = createInsertSchema(categories).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertExpenseSchema = createInsertSchema(expenses).omit({
   id: true,
   createdAt: true,
@@ -28,5 +41,7 @@ export const insertExpenseSchema = createInsertSchema(expenses).omit({
 
 export type Balance = typeof balance.$inferSelect;
 export type InsertBalance = z.infer<typeof insertBalanceSchema>;
+export type Category = typeof categories.$inferSelect;
+export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Expense = typeof expenses.$inferSelect;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
