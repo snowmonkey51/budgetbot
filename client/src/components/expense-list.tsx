@@ -236,6 +236,16 @@ export function ExpenseList() {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="ml-13">
+                      <Textarea
+                        value={editNotes}
+                        onChange={(e) => setEditNotes(e.target.value)}
+                        placeholder="Notes (optional)"
+                        className="h-16 text-sm"
+                      />
+                    </div>
+                    <div className="ml-13">
                       <div className="flex space-x-1">
                         <Button
                           variant="ghost"
