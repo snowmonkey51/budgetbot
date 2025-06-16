@@ -320,7 +320,13 @@ export function ExpenseList() {
         <div className="divide-y divide-slate-100">
           {expenses && expenses.length > 0 ? (
             expenses
-              .sort((a, b) => a.category.localeCompare(b.category))
+              .sort((a, b) => {
+                // First sort by category
+                const categoryCompare = a.category.localeCompare(b.category);
+                if (categoryCompare !== 0) return categoryCompare;
+                // Then sort by description within the same category
+                return a.description.localeCompare(b.description);
+              })
               .map((expense) => (
               <div key={expense.id} className={`p-4 transition-colors ${getCategoryBackgroundColor(expense.category)} ${expense.cleared ? 'opacity-50' : ''}`}>
                 {editingId === expense.id ? (
