@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Edit, Trash2, Check, X, Receipt, Calendar } from "lucide-react";
+import { Edit, Trash2, Check, X, Receipt, Calendar, Eraser } from "lucide-react";
 import type { Expense, Balance, Category } from "@shared/schema";
 
 export function ExpenseListSecond() {
@@ -93,6 +93,33 @@ export function ExpenseListSecond() {
       toast({
         title: "Error",
         description: "Failed to update expense status. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const clearAllMutation = useMutation({
+    mutationFn: async () => {
+      if (!expenses || expenses.length === 0) return;
+      
+      // Delete all expenses for this period
+      await Promise.all(
+        expenses.map(expense => 
+          apiRequest("DELETE", `/api/expenses/${expense.id}`)
+        )
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", "second-half"] });
+      toast({
+        title: "Success",
+        description: "All expenses have been cleared.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to clear expenses. Please try again.",
         variant: "destructive",
       });
     },
@@ -226,6 +253,18 @@ export function ExpenseListSecond() {
               <span className="text-sm text-slate-500">
                 Total: <span className="font-medium text-slate-900">{formatCurrency(totalExpenses)}</span>
               </span>
+              {expenses && expenses.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => clearAllMutation.mutate()}
+                  disabled={clearAllMutation.isPending}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Eraser className="w-4 h-4 mr-1" />
+                  Clear All
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
