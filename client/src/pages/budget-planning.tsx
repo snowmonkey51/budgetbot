@@ -17,7 +17,7 @@ export default function BudgetPlanning() {
           <QuickTemplate period="planning" />
           <TemplateLoader period="planning" />
         </div>
-
+        <SpendingChartPlanning />
       </div>
 
       {/* Right Panel */}
