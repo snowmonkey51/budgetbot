@@ -390,60 +390,88 @@ export function ExpenseList() {
       </Card>
 
       {/* Spendable Balance Card */}
-      <div className="rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
+      <div className="rounded-xl shadow-lg relative overflow-hidden">
         {/* Dynamic background based on spending ratio */}
         <div 
-          className="absolute inset-0 bg-gradient-to-r transition-all duration-500"
+          className="absolute inset-0 transition-all duration-700 ease-in-out"
           style={{
             background: (() => {
-              if (!balance) return 'linear-gradient(to right, #16a34a, #15803d)';
+              if (!balance) return 'linear-gradient(135deg, #059669, #047857, #065f46)';
               
               const currentBalance = parseFloat(balance.amount);
               const spentRatio = totalExpenses / currentBalance;
               
-              if (spentRatio <= 0.5) {
-                // Green when less than 50% spent
-                return 'linear-gradient(to right, #16a34a, #15803d)';
-              } else if (spentRatio <= 0.75) {
-                // Yellow/orange when 50-75% spent
-                return 'linear-gradient(to right, #d97706, #c2410c)';
-              } else if (spentRatio <= 0.9) {
-                // Orange/red when 75-90% spent
-                return 'linear-gradient(to right, #ea580c, #dc2626)';
+              if (spentRatio <= 0.3) {
+                // Bright green when less than 30% spent
+                return 'linear-gradient(135deg, #10b981, #059669, #047857)';
+              } else if (spentRatio <= 0.5) {
+                // Green-yellow when 30-50% spent
+                return 'linear-gradient(135deg, #84cc16, #65a30d, #4d7c0f)';
+              } else if (spentRatio <= 0.7) {
+                // Yellow-orange when 50-70% spent  
+                return 'linear-gradient(135deg, #f59e0b, #d97706, #b45309)';
+              } else if (spentRatio <= 0.85) {
+                // Orange when 70-85% spent
+                return 'linear-gradient(135deg, #f97316, #ea580c, #c2410c)';
+              } else if (spentRatio <= 0.95) {
+                // Red-orange when 85-95% spent
+                return 'linear-gradient(135deg, #ef4444, #dc2626, #b91c1c)';
               } else {
-                // Red when over 90% spent
-                return 'linear-gradient(to right, #dc2626, #b91c1c)';
+                // Bright red when over 95% spent
+                return 'linear-gradient(135deg, #dc2626, #b91c1c, #991b1b)';
               }
             })()
           }}
         />
-        
-        {/* Progress bar overlay */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black bg-opacity-20">
+
+        {/* Large progress bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-3 bg-black bg-opacity-30">
           <div 
-            className="h-full bg-white bg-opacity-40 transition-all duration-500"
+            className="h-full bg-white transition-all duration-700 ease-out shadow-lg"
             style={{
-              width: balance ? `${Math.min((totalExpenses / parseFloat(balance.amount)) * 100, 100)}%` : '0%'
+              width: balance ? `${Math.min((totalExpenses / parseFloat(balance.amount)) * 100, 100)}%` : '0%',
+              boxShadow: '0 0 10px rgba(255,255,255,0.5)'
             }}
           />
         </div>
-        
-        <div className="relative z-10">
-          <div className="flex items-center justify-end mb-2">
-            <h3 className="text-sm font-medium text-opacity-90">Spendable Balance</h3>
+
+        {/* Spending percentage indicator */}
+        <div className="absolute top-4 left-4">
+          <div className="bg-black bg-opacity-30 rounded-lg px-3 py-2">
+            <div className="text-white text-2xl font-bold">
+              {balance ? Math.round((totalExpenses / parseFloat(balance.amount)) * 100) : 0}%
+            </div>
+            <div className="text-white text-xs opacity-90">USED</div>
           </div>
-          <div className="text-3xl font-bold text-right">
+        </div>
+        
+        <div className="relative z-10 p-6 pt-20">
+          <div className="flex items-center justify-end mb-2">
+            <h3 className="text-sm font-medium text-white text-opacity-90">Spendable Balance</h3>
+          </div>
+          <div className="text-4xl font-bold text-right text-white drop-shadow-lg">
             {formatCurrency(spendableBalance)}
           </div>
-          <p className="text-sm text-opacity-90 mt-1 text-right">
+          <p className="text-sm text-white text-opacity-90 mt-2 text-right">
             After {formatCurrency(totalExpenses)} in expenses
             {balance && (
-              <span className="block">
-                {Math.round((totalExpenses / parseFloat(balance.amount)) * 100)}% of budget used
+              <span className="block text-xs mt-1 opacity-80">
+                {formatCurrency(parseFloat(balance.amount) - totalExpenses)} remaining of {formatCurrency(parseFloat(balance.amount))}
               </span>
             )}
           </p>
         </div>
+
+        {/* Warning indicator for high spending */}
+        {balance && (totalExpenses / parseFloat(balance.amount)) > 0.8 && (
+          <div className="absolute top-4 right-4 animate-pulse">
+            <div className="bg-white bg-opacity-20 rounded-full p-2">
+              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
