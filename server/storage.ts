@@ -18,6 +18,7 @@ export interface IStorage {
   createExpense(expense: InsertExpense): Promise<Expense>;
   updateExpense(id: number, expense: Partial<InsertExpense>): Promise<Expense | undefined>;
   deleteExpense(id: number): Promise<boolean>;
+  toggleExpenseCleared(id: number): Promise<Expense | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -105,6 +106,19 @@ export class DatabaseStorage implements IStorage {
       .where(eq(expenses.id, id))
       .returning();
     return result.length > 0;
+  }
+
+  async toggleExpenseCleared(id: number): Promise<Expense | undefined> {
+    const [expense] = await db.select().from(expenses).where(eq(expenses.id, id));
+    if (!expense) return undefined;
+
+    const [updated] = await db
+      .update(expenses)
+      .set({ cleared: !expense.cleared })
+      .where(eq(expenses.id, id))
+      .returning();
+    
+    return updated || undefined;
   }
 }
 
@@ -204,6 +218,7 @@ export class MemStorage implements IStorage {
       amount: insertExpense.amount,
       category: insertExpense.category,
       notes: insertExpense.notes ?? null,
+      cleared: false,
       createdAt: new Date()
     };
     this.expenses.set(id, expense);
