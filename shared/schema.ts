@@ -27,6 +27,22 @@ export const expenses = pgTable("expenses", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const templates = pgTable("templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  period: text("period").notNull(), // "first-half" or "second-half"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const templateItems = pgTable("template_items", {
+  id: serial("id").primaryKey(),
+  templateId: integer("template_id").references(() => templates.id, { onDelete: "cascade" }).notNull(),
+  description: text("description").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  category: text("category").notNull(),
+  notes: text("notes"),
+});
+
 export const insertBalanceSchema = createInsertSchema(balance).omit({
   id: true,
   updatedAt: true,
@@ -42,9 +58,22 @@ export const insertExpenseSchema = createInsertSchema(expenses).omit({
   createdAt: true,
 });
 
+export const insertTemplateSchema = createInsertSchema(templates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTemplateItemSchema = createInsertSchema(templateItems).omit({
+  id: true,
+});
+
 export type Balance = typeof balance.$inferSelect;
 export type InsertBalance = z.infer<typeof insertBalanceSchema>;
 export type Category = typeof categories.$inferSelect;
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Expense = typeof expenses.$inferSelect;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
+export type Template = typeof templates.$inferSelect;
+export type InsertTemplate = z.infer<typeof insertTemplateSchema>;
+export type TemplateItem = typeof templateItems.$inferSelect;
+export type InsertTemplateItem = z.infer<typeof insertTemplateItemSchema>;
