@@ -28,6 +28,7 @@ export function ExpenseForm() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       setDescription("");
       setAmount("");
       setCategory("");

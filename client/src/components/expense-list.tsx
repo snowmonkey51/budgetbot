@@ -37,6 +37,7 @@ export function ExpenseList() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       setEditingId(null);
       toast({
         title: "Expense Updated",
@@ -128,6 +129,10 @@ export function ExpenseList() {
     return currentBalance - totalExpenses;
   };
 
+  const getCategoryByName = (categoryName: string) => {
+    return categories?.find(cat => cat.name.toLowerCase() === categoryName.toLowerCase());
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -174,8 +179,8 @@ export function ExpenseList() {
                 {editingId === expense.id ? (
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
-                      <div className={`w-10 h-10 ${categoryColors[editCategory] || 'bg-gray-100'} rounded-lg flex items-center justify-center`}>
-                        <span className="text-lg">{categoryIcons[editCategory] || '📋'}</span>
+                      <div className={`w-10 h-10 ${getCategoryByName(editCategory)?.color || 'bg-gray-100'} rounded-lg flex items-center justify-center`}>
+                        <span className="text-lg">{getCategoryByName(editCategory)?.icon || '📋'}</span>
                       </div>
                       <Input
                         value={editDescription}
@@ -202,13 +207,14 @@ export function ExpenseList() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="food">{categoryIcons.food} Food</SelectItem>
-                          <SelectItem value="transport">{categoryIcons.transport} Transport</SelectItem>
-                          <SelectItem value="shopping">{categoryIcons.shopping} Shopping</SelectItem>
-                          <SelectItem value="bills">{categoryIcons.bills} Bills</SelectItem>
-                          <SelectItem value="entertainment">{categoryIcons.entertainment} Entertainment</SelectItem>
-                          <SelectItem value="health">{categoryIcons.health} Health</SelectItem>
-                          <SelectItem value="other">{categoryIcons.other} Other</SelectItem>
+                          {categories && categories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.name.toLowerCase()}>
+                              <div className="flex items-center gap-2">
+                                <span>{cat.icon}</span>
+                                <span>{cat.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <div className="flex space-x-1">
@@ -236,8 +242,8 @@ export function ExpenseList() {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className={`w-10 h-10 ${categoryColors[expense.category]} rounded-lg flex items-center justify-center`}>
-                        <span className="text-lg">{categoryIcons[expense.category] || '📋'}</span>
+                      <div className={`w-10 h-10 ${getCategoryByName(expense.category)?.color || 'bg-gray-100'} rounded-lg flex items-center justify-center`}>
+                        <span className="text-lg">{getCategoryByName(expense.category)?.icon || '📋'}</span>
                       </div>
                       <div>
                         <h3 className="font-medium text-slate-900">{expense.description}</h3>
