@@ -201,7 +201,8 @@ export class MemStorage implements IStorage {
     const expense: Expense = {
       ...insertExpense,
       id,
-      createdAt: new Date()
+      createdAt: new Date(),
+      dueDate: insertExpense.dueDate || null
     };
     this.expenses.set(id, expense);
     return expense;
