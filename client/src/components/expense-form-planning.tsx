@@ -116,6 +116,7 @@ export function ExpenseFormPlanning() {
                   placeholder="Description (e.g., Grocery shopping)"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  spellCheck={true}
                 />
               </div>
               

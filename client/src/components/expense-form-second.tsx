@@ -119,6 +119,7 @@ export function ExpenseFormSecond() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full"
+                  spellCheck={true}
                 />
               </div>
 
@@ -159,6 +160,7 @@ export function ExpenseFormSecond() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="h-20 text-sm resize-none"
+                  spellCheck={true}
                 />
               </div>
 

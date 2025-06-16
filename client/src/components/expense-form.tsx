@@ -125,6 +125,7 @@ export function ExpenseForm() {
               onChange={(e) => setDescription(e.target.value)}
               className="mt-2"
               placeholder="e.g., Grocery shopping"
+              spellCheck={true}
               required
             />
           </div>
@@ -198,6 +199,7 @@ export function ExpenseForm() {
                 onChange={(e) => setNotes(e.target.value)}
                 className="mt-1 h-20"
                 placeholder="Add any additional notes..."
+                spellCheck={true}
               />
             </div>
           </div>
