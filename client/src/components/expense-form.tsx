@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { CategoryManager } from "./category-manager";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, ChevronDown, ChevronUp } from "lucide-react";
 import type { InsertExpense, Category } from "@shared/schema";
 
 export function ExpenseForm() {
@@ -18,6 +19,7 @@ export function ExpenseForm() {
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [notes, setNotes] = useState("");
+  const [isOpen, setIsOpen] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -92,11 +94,27 @@ export function ExpenseForm() {
 
   return (
     <Card>
-      <CardContent className="p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Add New Expense</h2>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CardHeader className="pb-3">
+          <CollapsibleTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
+            >
+              <h2 className="text-lg font-semibold text-slate-900">Add New Expense</h2>
+              {isOpen ? (
+                <ChevronUp className="h-4 w-4 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-slate-500" />
+              )}
+            </Button>
+          </CollapsibleTrigger>
+        </CardHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+        <CollapsibleContent>
+          <CardContent className="pt-0 px-6 pb-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
             <Label htmlFor="expense-description" className="text-sm font-medium text-slate-700">
               Description
             </Label>
@@ -184,16 +202,18 @@ export function ExpenseForm() {
             </div>
           </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-green-600 hover:bg-green-700"
-            disabled={createExpenseMutation.isPending}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {createExpenseMutation.isPending ? "Adding..." : "Add Expense"}
-          </Button>
-        </form>
-      </CardContent>
+              <Button
+                type="submit"
+                className="w-full bg-green-600 hover:bg-green-700"
+                disabled={createExpenseMutation.isPending}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {createExpenseMutation.isPending ? "Adding..." : "Add Expense"}
+              </Button>
+            </form>
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 }
