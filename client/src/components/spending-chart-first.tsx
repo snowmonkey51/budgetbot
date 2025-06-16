@@ -26,6 +26,10 @@ export function SpendingChartFirst() {
   const getChartData = () => {
     if (!expenses || !categories) return [];
 
+    // Debug logging
+    console.log('First Half Chart - Expenses:', expenses);
+    console.log('First Half Chart - Categories:', categories);
+
     const spendingByCategory = expenses
       .filter(expense => !expense.cleared)
       .reduce((acc, expense) => {
@@ -45,9 +49,12 @@ export function SpendingChartFirst() {
         return acc;
       }, {} as Record<string, { name: string; value: number; color: string; icon: string }>);
 
-    return Object.values(spendingByCategory)
+    const result = Object.values(spendingByCategory)
       .filter(item => item.value > 0)
       .sort((a, b) => b.value - a.value);
+    
+    console.log('First Half Chart - Chart Data:', result);
+    return result;
   };
 
   const chartData = getChartData();
