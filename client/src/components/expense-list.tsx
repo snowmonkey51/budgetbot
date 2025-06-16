@@ -22,7 +22,12 @@ export function ExpenseList() {
   const queryClient = useQueryClient();
 
   const { data: expenses, isLoading } = useQuery<Expense[]>({
-    queryKey: ["/api/expenses"],
+    queryKey: ["/api/expenses", "first-half"],
+    queryFn: async () => {
+      const response = await fetch("/api/expenses?period=first-half");
+      if (!response.ok) throw new Error("Failed to fetch expenses");
+      return response.json();
+    },
   });
 
   const { data: balance } = useQuery<Balance | null>({
@@ -39,7 +44,7 @@ export function ExpenseList() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", "first-half"] });
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       setEditingId(null);
       toast({
@@ -61,7 +66,7 @@ export function ExpenseList() {
       await apiRequest("DELETE", `/api/expenses/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", "first-half"] });
       toast({
         title: "Expense Deleted",
         description: "The expense has been successfully deleted.",
@@ -82,7 +87,7 @@ export function ExpenseList() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", "first-half"] });
     },
     onError: () => {
       toast({
