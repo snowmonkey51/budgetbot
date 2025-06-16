@@ -77,15 +77,15 @@ export function BalanceForm() {
   }
 
   return (
-    <Card className="bg-blue-100 border-blue-300">
+    <Card className="bg-gradient-to-br from-blue-500 to-blue-700 border-blue-600 text-white">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-slate-900">Current Balance</h2>
+          <h2 className="text-lg font-semibold text-white">Current Balance</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={startEditing}
-            className="text-slate-400 hover:text-blue-600"
+            className="text-white/70 hover:text-white hover:bg-white/10"
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -94,11 +94,11 @@ export function BalanceForm() {
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="balance-amount" className="text-sm font-medium text-slate-700">
+              <Label htmlFor="balance-amount" className="text-sm font-medium text-white">
                 Available Balance
               </Label>
               <div className="relative mt-2">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 text-lg font-medium">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-600 text-lg font-medium">
                   $
                 </span>
                 <Input
@@ -108,7 +108,7 @@ export function BalanceForm() {
                   min="0"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-8 pr-4 py-3 text-2xl font-semibold bg-slate-50"
+                  className="w-full pl-8 pr-4 py-3 text-2xl font-semibold bg-white/90 text-slate-900"
                   placeholder="0.00"
                   autoFocus
                   required
@@ -119,7 +119,7 @@ export function BalanceForm() {
             <div className="flex gap-2">
               <Button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                className="flex-1 bg-white text-blue-700 hover:bg-white/90"
                 disabled={updateBalanceMutation.isPending}
               >
                 {updateBalanceMutation.isPending ? "Updating..." : "Update Balance"}
@@ -129,6 +129,7 @@ export function BalanceForm() {
                 variant="outline"
                 onClick={() => setIsEditing(false)}
                 disabled={updateBalanceMutation.isPending}
+                className="border-white/30 text-white hover:bg-white/10"
               >
                 Cancel
               </Button>
@@ -136,10 +137,10 @@ export function BalanceForm() {
           </form>
         ) : (
           <div className="text-center">
-            <div className="text-3xl font-bold text-slate-900 mb-2">
+            <div className="text-3xl font-bold text-white mb-2">
               {balance ? formatCurrency(balance.amount) : "$0.00"}
             </div>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-white/70">
               Last updated: {balance ? new Date(balance.updatedAt).toLocaleString() : "Never"}
             </p>
           </div>
