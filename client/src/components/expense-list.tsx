@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Edit, Trash2, Check, X, Receipt } from "lucide-react";
+import { Edit, Trash2, Check, X, Receipt, Calendar } from "lucide-react";
 import type { Expense, Balance, Category } from "@shared/schema";
 
 export function ExpenseList() {
@@ -163,7 +163,10 @@ export function ExpenseList() {
       <Card>
         <CardContent className="p-6 border-b border-slate-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">1-15 Expenses</h2>
+            <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              1-15 Expenses
+            </h2>
             <div className="flex items-center space-x-3">
               <span className="text-sm text-slate-500">
                 Total: <span className="font-medium text-slate-900">{formatCurrency(totalExpenses)}</span>
