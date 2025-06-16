@@ -196,7 +196,7 @@ export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps
             <DialogTitle>Load Template</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            {templates.map((template: Template & { items: TemplateItem[] }) => (
+            {[...templates].reverse().map((template: Template & { items: TemplateItem[] }) => (
               <div key={template.id} className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium">{template.name}</h4>
