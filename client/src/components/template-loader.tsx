@@ -214,7 +214,7 @@ export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps
                 <div className="mt-2 space-y-1">
                   {template.items.slice(0, 3).map((item) => (
                     <div key={item.id} className="text-xs text-gray-500">
-                      • {item.description} - ${item.amount}
+                      • {item.description} - ${item.amount} ({item.category})
                     </div>
                   ))}
                   {template.items.length > 3 && (
