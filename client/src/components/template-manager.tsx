@@ -16,7 +16,7 @@ import type { Template, TemplateItem, InsertTemplate, InsertTemplateItem, Catego
 
 const templateSchema = z.object({
   name: z.string().min(1, "Template name is required"),
-  period: z.enum(["first-half", "second-half"])
+  period: z.enum(["first-half", "second-half", "planning"])
 });
 
 const templateItemSchema = z.object({

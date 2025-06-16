@@ -12,7 +12,7 @@ import { queryClient } from "@/lib/queryClient";
 import type { Category } from "@shared/schema";
 
 interface QuickTemplateProps {
-  period: "first-half" | "second-half";
+  period: "first-half" | "second-half" | "planning";
 }
 
 export function QuickTemplate({ period }: QuickTemplateProps) {

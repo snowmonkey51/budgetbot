@@ -46,8 +46,8 @@ export default function BudgetPlanning() {
             <CardTitle className="text-base font-medium">Template Management</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <QuickTemplate period="first-half" />
-            <TemplateLoader period="first-half" />
+            <QuickTemplate period="planning" />
+            <TemplateLoader period="planning" />
           </CardContent>
         </Card>
 
