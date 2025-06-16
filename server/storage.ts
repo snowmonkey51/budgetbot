@@ -44,7 +44,7 @@ export interface IStorage {
   addTemplateItem(templateId: number, item: InsertTemplateItem): Promise<TemplateItem>;
   updateTemplateItem(id: number, item: Partial<InsertTemplateItem>): Promise<TemplateItem | undefined>;
   deleteTemplateItem(id: number): Promise<boolean>;
-  loadTemplate(templateId: number): Promise<Expense[]>;
+  loadTemplate(templateId: number, targetPeriod?: string): Promise<Expense[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -217,7 +217,7 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
-  async loadTemplate(templateId: number): Promise<Expense[]> {
+  async loadTemplate(templateId: number, targetPeriod?: string): Promise<Expense[]> {
     const template = await db.select().from(templates).where(eq(templates.id, templateId)).limit(1);
     if (!template.length) return [];
 
@@ -232,7 +232,7 @@ export class DatabaseStorage implements IStorage {
           amount: item.amount,
           category: item.category,
           notes: item.notes,
-          period: template[0].period,
+          period: targetPeriod || template[0].period,
           cleared: false
         })
         .returning();
@@ -458,7 +458,7 @@ export class MemStorage implements IStorage {
     return this.templateItems.delete(id);
   }
 
-  async loadTemplate(templateId: number): Promise<Expense[]> {
+  async loadTemplate(templateId: number, targetPeriod?: string): Promise<Expense[]> {
     const template = this.templates.get(templateId);
     if (!template) return [];
 
@@ -473,7 +473,7 @@ export class MemStorage implements IStorage {
         amount: item.amount,
         category: item.category,
         notes: item.notes || null,
-        period: template.period,
+        period: targetPeriod || template.period,
         cleared: false,
         createdAt: new Date()
       };

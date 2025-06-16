@@ -27,7 +27,7 @@ const templateItemSchema = z.object({
 });
 
 interface TemplateManagerProps {
-  period: "first-half" | "second-half";
+  period: "first-half" | "second-half" | "planning";
   onTemplateLoaded?: () => void;
 }
 
@@ -120,7 +120,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
 
   const loadTemplateMutation = useMutation({
     mutationFn: async (templateId: number) => {
-      return apiRequest(`/api/templates/${templateId}/load`, "POST");
+      return apiRequest("/api/templates/" + templateId + "/load", "POST", { targetPeriod: period });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });

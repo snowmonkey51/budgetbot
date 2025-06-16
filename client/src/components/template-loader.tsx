@@ -12,7 +12,7 @@ import { queryClient } from "@/lib/queryClient";
 import type { Template, TemplateItem, Category } from "@shared/schema";
 
 interface TemplateLoaderProps {
-  period: "first-half" | "second-half";
+  period: "first-half" | "second-half" | "planning";
   onTemplateLoaded?: () => void;
 }
 
@@ -40,6 +40,10 @@ export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps
     mutationFn: async (templateId: number) => {
       const response = await fetch(`/api/templates/${templateId}/load`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ targetPeriod: period }),
       });
       return response.json();
     },
