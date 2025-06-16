@@ -390,7 +390,7 @@ export function ExpenseList() {
       </Card>
 
       {/* Spendable Balance Card */}
-      <div className="rounded-xl shadow-lg relative overflow-hidden">
+      <div className="rounded-xl shadow-lg relative overflow-hidden h-32">
         {/* Dynamic background based on spending ratio */}
         <div 
           className="absolute inset-0 transition-all duration-700 ease-in-out"
