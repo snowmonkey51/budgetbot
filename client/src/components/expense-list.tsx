@@ -163,7 +163,7 @@ export function ExpenseList() {
       <Card>
         <CardContent className="p-6 border-b border-slate-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">Recent Expenses</h2>
+            <h2 className="text-lg font-semibold text-slate-900">1-15 Expenses</h2>
             <div className="flex items-center space-x-3">
               <span className="text-sm text-slate-500">
                 Total: <span className="font-medium text-slate-900">{formatCurrency(totalExpenses)}</span>
