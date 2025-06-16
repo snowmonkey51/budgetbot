@@ -51,11 +51,11 @@ export const categoryIcons: Record<string, string> = {
 };
 
 export const categoryColors: Record<string, string> = {
-  food: 'bg-orange-100',
-  transport: 'bg-blue-100',
-  shopping: 'bg-green-100',
-  bills: 'bg-purple-100',
-  entertainment: 'bg-red-100',
-  health: 'bg-pink-100',
-  other: 'bg-gray-100',
+  food: 'bg-orange-500',
+  transport: 'bg-blue-500',
+  shopping: 'bg-green-500',
+  bills: 'bg-purple-500',
+  entertainment: 'bg-red-500',
+  health: 'bg-pink-500',
+  other: 'bg-gray-500',
 };
