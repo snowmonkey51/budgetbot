@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -282,15 +283,35 @@ export function ExpenseList() {
                 Total: <span className="font-medium text-slate-900">{formatCurrency(totalExpenses)}</span>
               </span>
               {expenses && expenses.length > 0 && (
-                <Button
-                  size="sm"
-                  onClick={() => clearAllMutation.mutate()}
-                  disabled={clearAllMutation.isPending}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                >
-                  <Eraser className="w-4 h-4 mr-1" />
-                  Clear All
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      disabled={clearAllMutation.isPending}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      <Eraser className="w-4 h-4 mr-1" />
+                      Clear All
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete all expenses from the first half of the month (1-15). This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => clearAllMutation.mutate()}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Delete All Expenses
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
             </div>
           </div>
