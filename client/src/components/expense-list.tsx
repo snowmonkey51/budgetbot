@@ -140,28 +140,51 @@ export function ExpenseList() {
 
   const getCategoryBackgroundColor = (categoryName: string) => {
     const category = getCategoryByName(categoryName);
-    if (!category?.color) return 'bg-gray-50 hover:bg-gray-100';
+    
+    if (!category?.color) {
+      return 'bg-gray-50 hover:bg-gray-100';
+    }
     
     // Map the category colors to predefined background colors
     const colorMap: Record<string, string> = {
+      // Support both light and dark color variants
+      'bg-orange-100': 'bg-orange-50 hover:bg-orange-100',
       'bg-orange-500': 'bg-orange-50 hover:bg-orange-100',
+      'bg-blue-100': 'bg-blue-50 hover:bg-blue-100',
       'bg-blue-500': 'bg-blue-50 hover:bg-blue-100',
+      'bg-green-100': 'bg-green-50 hover:bg-green-100',
       'bg-green-500': 'bg-green-50 hover:bg-green-100',
+      'bg-purple-100': 'bg-purple-50 hover:bg-purple-100',
       'bg-purple-500': 'bg-purple-50 hover:bg-purple-100',
+      'bg-red-100': 'bg-red-50 hover:bg-red-100',
       'bg-red-500': 'bg-red-50 hover:bg-red-100',
+      'bg-pink-100': 'bg-pink-50 hover:bg-pink-100',
       'bg-pink-500': 'bg-pink-50 hover:bg-pink-100',
+      'bg-gray-100': 'bg-gray-50 hover:bg-gray-100',
       'bg-gray-500': 'bg-gray-50 hover:bg-gray-100',
+      'bg-yellow-100': 'bg-yellow-50 hover:bg-yellow-100',
       'bg-yellow-500': 'bg-yellow-50 hover:bg-yellow-100',
+      'bg-indigo-100': 'bg-indigo-50 hover:bg-indigo-100',
       'bg-indigo-500': 'bg-indigo-50 hover:bg-indigo-100',
+      'bg-teal-100': 'bg-teal-50 hover:bg-teal-100',
       'bg-teal-500': 'bg-teal-50 hover:bg-teal-100',
+      'bg-cyan-100': 'bg-cyan-50 hover:bg-cyan-100',
       'bg-cyan-500': 'bg-cyan-50 hover:bg-cyan-100',
+      'bg-emerald-100': 'bg-emerald-50 hover:bg-emerald-100',
       'bg-emerald-500': 'bg-emerald-50 hover:bg-emerald-100',
+      'bg-lime-100': 'bg-lime-50 hover:bg-lime-100',
       'bg-lime-500': 'bg-lime-50 hover:bg-lime-100',
+      'bg-amber-100': 'bg-amber-50 hover:bg-amber-100',
       'bg-amber-500': 'bg-amber-50 hover:bg-amber-100',
+      'bg-rose-100': 'bg-rose-50 hover:bg-rose-100',
       'bg-rose-500': 'bg-rose-50 hover:bg-rose-100',
+      'bg-violet-100': 'bg-violet-50 hover:bg-violet-100',
       'bg-violet-500': 'bg-violet-50 hover:bg-violet-100',
+      'bg-fuchsia-100': 'bg-fuchsia-50 hover:bg-fuchsia-100',
       'bg-fuchsia-500': 'bg-fuchsia-50 hover:bg-fuchsia-100',
+      'bg-sky-100': 'bg-sky-50 hover:bg-sky-100',
       'bg-sky-500': 'bg-sky-50 hover:bg-sky-100',
+      'bg-slate-100': 'bg-slate-50 hover:bg-slate-100',
       'bg-slate-500': 'bg-slate-50 hover:bg-slate-100',
     };
     
