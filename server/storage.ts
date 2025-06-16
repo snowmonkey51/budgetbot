@@ -240,6 +240,18 @@ export class MemStorage implements IStorage {
   async deleteExpense(id: number): Promise<boolean> {
     return this.expenses.delete(id);
   }
+
+  async toggleExpenseCleared(id: number): Promise<Expense | undefined> {
+    const existing = this.expenses.get(id);
+    if (!existing) return undefined;
+
+    const updated: Expense = {
+      ...existing,
+      cleared: !existing.cleared
+    };
+    this.expenses.set(id, updated);
+    return updated;
+  }
 }
 
 export const storage = new DatabaseStorage();

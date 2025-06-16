@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -75,6 +76,23 @@ export function ExpenseList() {
     },
   });
 
+  const toggleClearedMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("PATCH", `/api/expenses/${id}/toggle-cleared`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update expense status. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const startEditing = (expense: Expense) => {
     setEditingId(expense.id);
     setEditDescription(expense.description);
@@ -124,7 +142,9 @@ export function ExpenseList() {
 
   const calculateTotalExpenses = () => {
     if (!expenses) return 0;
-    return expenses.reduce((total, expense) => total + parseFloat(expense.amount), 0);
+    return expenses
+      .filter(expense => !expense.cleared)
+      .reduce((total, expense) => total + parseFloat(expense.amount), 0);
   };
 
   const calculateSpendableBalance = () => {
@@ -236,7 +256,7 @@ export function ExpenseList() {
         <div className="divide-y divide-slate-100">
           {expenses && expenses.length > 0 ? (
             expenses.map((expense) => (
-              <div key={expense.id} className={`p-4 transition-colors ${getCategoryBackgroundColor(expense.category)}`}>
+              <div key={expense.id} className={`p-4 transition-colors ${getCategoryBackgroundColor(expense.category)} ${expense.cleared ? 'opacity-50' : ''}`}>
                 {editingId === expense.id ? (
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
@@ -324,6 +344,14 @@ export function ExpenseList() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-slate-500">Cleared</span>
+                        <Switch
+                          checked={expense.cleared || false}
+                          onCheckedChange={() => toggleClearedMutation.mutate(expense.id)}
+                          disabled={toggleClearedMutation.isPending}
+                        />
+                      </div>
                       <span className="font-semibold text-slate-900">-{formatCurrency(expense.amount)}</span>
                       <div className="flex space-x-1">
                         <Button

@@ -149,6 +149,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Toggle expense cleared status
+  app.patch("/api/expenses/:id/toggle-cleared", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid expense ID" });
+      }
+
+      const expense = await storage.toggleExpenseCleared(id);
+      if (!expense) {
+        return res.status(404).json({ message: "Expense not found" });
+      }
+
+      res.json(expense);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to toggle expense cleared status" });
+    }
+  });
+
   // Delete expense
   app.delete("/api/expenses/:id", async (req, res) => {
     try {
