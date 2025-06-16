@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Download, FileText, Edit, Trash2, Plus, Save } from "lucide-react";
+import { Download, FileText, Edit, Trash2, Plus, Save, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import type { Template, TemplateItem, Category } from "@shared/schema";
@@ -159,6 +159,20 @@ export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps
     setEditedItems(newItems);
   };
 
+  const moveItemUp = (index: number) => {
+    if (index === 0) return;
+    const newItems = [...editedItems];
+    [newItems[index], newItems[index - 1]] = [newItems[index - 1], newItems[index]];
+    setEditedItems(newItems);
+  };
+
+  const moveItemDown = (index: number) => {
+    if (index === editedItems.length - 1) return;
+    const newItems = [...editedItems];
+    [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+    setEditedItems(newItems);
+  };
+
   if (isLoading || templates.length === 0) {
     return null;
   }
@@ -252,6 +266,28 @@ export function TemplateLoader({ period, onTemplateLoaded }: TemplateLoaderProps
                 {editedItems.map((item, index) => (
                   <div key={index} className="space-y-2 p-3 border rounded-lg">
                     <div className="flex gap-2">
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => moveItemUp(index)}
+                          disabled={index === 0}
+                          className="h-6 w-6 p-0"
+                        >
+                          <ChevronUp className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => moveItemDown(index)}
+                          disabled={index === editedItems.length - 1}
+                          className="h-6 w-6 p-0"
+                        >
+                          <ChevronDown className="w-3 h-3" />
+                        </Button>
+                      </div>
                       <Input
                         placeholder="Description"
                         value={item.description}
