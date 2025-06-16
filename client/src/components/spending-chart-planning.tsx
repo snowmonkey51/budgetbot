@@ -162,53 +162,53 @@ export function SpendingChartPlanning() {
         </div>
       </div>
 
-      {/* Pie Chart */}
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              innerRadius={40}
-              outerRadius={80}
-              paddingAngle={2}
-              dataKey="value"
-            >
-              {chartData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={getChartColor(entry.color)}
-                />
-              ))}
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+          {/* Pie Chart */}
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={80}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={getChartColor(entry.color)}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
-            {/* Category Breakdown */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-slate-700 mb-3">Category Breakdown</h4>
-              {chartData
-                .sort((a, b) => b.value - a.value)
-                .map((category, index) => (
-                <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{category.icon}</span>
-                    <span className="text-sm font-medium text-slate-700">{category.name}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm font-semibold text-slate-900">{formatCurrency(category.value)}</span>
-                    <div className="text-xs text-slate-500">
-                      {((category.value / totalSpent) * 100).toFixed(1)}%
-                    </div>
+          {/* Category Breakdown */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-slate-700 mb-3">Category Breakdown</h4>
+            {chartData
+              .sort((a, b) => b.value - a.value)
+              .map((category, index) => (
+              <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{category.icon}</span>
+                  <span className="text-sm font-medium text-slate-700">{category.name}</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm font-semibold text-slate-900">{formatCurrency(category.value)}</span>
+                  <div className="text-xs text-slate-500">
+                    {((category.value / totalSpent) * 100).toFixed(1)}%
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        </CardContent>
-      </Card>
-    );
-  }
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
