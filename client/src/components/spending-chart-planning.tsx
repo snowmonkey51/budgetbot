@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { formatCurrency } from "@/lib/utils";
+import { PieChart as PieChartIcon, TrendingUp } from "lucide-react";
 import type { Expense, Balance, Category } from "@shared/schema";
 
 export function SpendingChartPlanning() {
@@ -97,20 +99,38 @@ export function SpendingChartPlanning() {
 
   if (chartData.length === 0) {
     return (
-      <div className="text-center py-8">
-        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <PieChart className="w-8 h-8 text-slate-400" />
-        </div>
-        <h3 className="text-lg font-medium text-slate-900 mb-2">No spending data</h3>
-        <p className="text-slate-500 text-sm">Add some planning expenses to see your spending breakdown.</p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <PieChartIcon className="h-5 w-5" />
+            Spending Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <PieChartIcon className="w-8 h-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No spending data</h3>
+            <p className="text-slate-500 text-sm">Add some planning expenses to see your spending breakdown.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Summary Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <PieChartIcon className="h-5 w-5" />
+          Spending Overview
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+          <div className="space-y-4">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="text-center">
           <p className="text-sm text-slate-500">Total Planned</p>
           <p className="text-xl font-bold text-slate-900">{formatCurrency(totalSpent)}</p>
@@ -167,26 +187,28 @@ export function SpendingChartPlanning() {
         </ResponsiveContainer>
       </div>
 
-      {/* Category Breakdown */}
-      <div className="space-y-2">
-        <h4 className="text-sm font-medium text-slate-700 mb-3">Category Breakdown</h4>
-        {chartData
-          .sort((a, b) => b.value - a.value)
-          .map((category, index) => (
-          <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{category.icon}</span>
-              <span className="text-sm font-medium text-slate-700">{category.name}</span>
-            </div>
-            <div className="text-right">
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(category.value)}</span>
-              <div className="text-xs text-slate-500">
-                {((category.value / totalSpent) * 100).toFixed(1)}%
-              </div>
+            {/* Category Breakdown */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-slate-700 mb-3">Category Breakdown</h4>
+              {chartData
+                .sort((a, b) => b.value - a.value)
+                .map((category, index) => (
+                <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{category.icon}</span>
+                    <span className="text-sm font-medium text-slate-700">{category.name}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-semibold text-slate-900">{formatCurrency(category.value)}</span>
+                    <div className="text-xs text-slate-500">
+                      {((category.value / totalSpent) * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+        </CardContent>
+      </Card>
+    );
+  }
