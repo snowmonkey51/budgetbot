@@ -86,8 +86,7 @@ export function SpendingChartSecond() {
   return (
     <Card>
       <CardContent className="p-6">
-        <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <PieChartIcon className="h-4 w-4" />
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">
           Spending Breakdown
         </h3>
         
