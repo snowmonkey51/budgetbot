@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { formatCurrency, formatDate, categoryBackgroundColors } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { Edit, Trash2, Check, X, Receipt, Calendar } from "lucide-react";
 import type { Expense, Balance, Category } from "@shared/schema";
 
@@ -133,6 +133,17 @@ export function ExpenseList() {
     return categories?.find(cat => cat.name.toLowerCase() === categoryName.toLowerCase());
   };
 
+  const getCategoryBackgroundColor = (categoryName: string) => {
+    const category = getCategoryByName(categoryName);
+    if (!category?.color) return 'bg-gray-50 hover:bg-gray-100';
+    
+    // Extract the color name from the category color (e.g., 'bg-purple-500' -> 'purple')
+    const colorMatch = category.color.match(/bg-(\w+)-/);
+    const colorName = colorMatch ? colorMatch[1] : 'gray';
+    
+    return `bg-${colorName}-50 hover:bg-${colorName}-100`;
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -178,7 +189,7 @@ export function ExpenseList() {
         <div className="divide-y divide-slate-100">
           {expenses && expenses.length > 0 ? (
             expenses.map((expense) => (
-              <div key={expense.id} className={`p-4 transition-colors ${categoryBackgroundColors[expense.category.toLowerCase()] || 'bg-gray-50 hover:bg-gray-100'}`}>
+              <div key={expense.id} className={`p-4 transition-colors ${getCategoryBackgroundColor(expense.category)}`}>
                 {editingId === expense.id ? (
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
