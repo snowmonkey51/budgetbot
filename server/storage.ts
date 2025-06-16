@@ -431,9 +431,12 @@ export class MemStorage implements IStorage {
   async addTemplateItem(templateId: number, item: InsertTemplateItem): Promise<TemplateItem> {
     const id = this.currentTemplateItemId++;
     const templateItem: TemplateItem = {
-      ...item,
       id,
-      templateId
+      templateId,
+      description: item.description,
+      amount: item.amount,
+      category: item.category,
+      notes: item.notes || null
     };
     this.templateItems.set(id, templateItem);
     return templateItem;

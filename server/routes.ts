@@ -188,6 +188,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get templates
+  app.get("/api/templates", async (req, res) => {
+    try {
+      const period = req.query.period as string;
+      const templates = await storage.getTemplates(period);
+      res.json(templates);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch templates" });
+    }
+  });
+
+  // Create template
+  app.post("/api/templates", async (req, res) => {
+    try {
+      const templateData = insertTemplateSchema.parse(req.body);
+      const template = await storage.createTemplate(templateData);
+      res.status(201).json(template);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid template data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create template" });
+      }
+    }
+  });
+
+  // Update template
+  app.put("/api/templates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid template ID" });
+      }
+
+      const templateData = insertTemplateSchema.partial().parse(req.body);
+      const template = await storage.updateTemplate(id, templateData);
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+
+      res.json(template);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid template data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to update template" });
+      }
+    }
+  });
+
+  // Delete template
+  app.delete("/api/templates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid template ID" });
+      }
+
+      const deleted = await storage.deleteTemplate(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+
+      res.json({ message: "Template deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete template" });
+    }
+  });
+
+  // Add template item
+  app.post("/api/templates/:id/items", async (req, res) => {
+    try {
+      const templateId = parseInt(req.params.id);
+      if (isNaN(templateId)) {
+        return res.status(400).json({ message: "Invalid template ID" });
+      }
+
+      const itemData = insertTemplateItemSchema.parse(req.body);
+      const item = await storage.addTemplateItem(templateId, itemData);
+      res.status(201).json(item);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid template item data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to add template item" });
+      }
+    }
+  });
+
+  // Update template item
+  app.put("/api/template-items/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid template item ID" });
+      }
+
+      const itemData = insertTemplateItemSchema.partial().parse(req.body);
+      const item = await storage.updateTemplateItem(id, itemData);
+      if (!item) {
+        return res.status(404).json({ message: "Template item not found" });
+      }
+
+      res.json(item);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid template item data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to update template item" });
+      }
+    }
+  });
+
+  // Delete template item
+  app.delete("/api/template-items/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid template item ID" });
+      }
+
+      const deleted = await storage.deleteTemplateItem(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Template item not found" });
+      }
+
+      res.json({ message: "Template item deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete template item" });
+    }
+  });
+
+  // Load template (create expenses from template)
+  app.post("/api/templates/:id/load", async (req, res) => {
+    try {
+      const templateId = parseInt(req.params.id);
+      if (isNaN(templateId)) {
+        return res.status(400).json({ message: "Invalid template ID" });
+      }
+
+      const expenses = await storage.loadTemplate(templateId);
+      res.json(expenses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to load template" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

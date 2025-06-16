@@ -2,6 +2,7 @@ import { BalanceForm } from "@/components/balance-form";
 import { ExpenseFormFirst } from "@/components/expense-form-first";
 import { ExpenseList } from "@/components/expense-list";
 import { SpendingChartFirst } from "@/components/spending-chart-first";
+import { TemplateManager } from "@/components/template-manager";
 import { Wallet } from "lucide-react";
 
 export default function Budget() {
