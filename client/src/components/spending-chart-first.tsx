@@ -26,33 +26,58 @@ export function SpendingChartFirst() {
   const getChartData = () => {
     if (!expenses || !categories) return [];
 
-    const categoryTotals = expenses
+    const spendingByCategory = expenses
       .filter(expense => !expense.cleared)
       .reduce((acc, expense) => {
-        const category = getCategoryByName(expense.category);
-        if (!category) return acc;
-
+        const category = categories.find(cat => cat.name.toLowerCase() === expense.category.toLowerCase());
+        const categoryName = category?.name || expense.category;
         const amount = parseFloat(expense.amount);
-        acc[category.name] = (acc[category.name] || 0) + amount;
+        
+        if (!acc[categoryName]) {
+          acc[categoryName] = {
+            name: categoryName,
+            value: 0,
+            color: category?.color || "#8884d8",
+            icon: category?.icon || "📋"
+          };
+        }
+        acc[categoryName].value += amount;
         return acc;
-      }, {} as Record<string, number>);
+      }, {} as Record<string, { name: string; value: number; color: string; icon: string }>);
 
-    return Object.entries(categoryTotals)
-      .filter(([, amount]) => amount > 0)
-      .map(([name, amount]) => {
-        const category = getCategoryByName(name);
-        return {
-          name,
-          value: amount,
-          color: category?.color || '#94a3b8',
-          icon: category?.icon || '📋'
-        };
-      })
+    return Object.values(spendingByCategory)
+      .filter(item => item.value > 0)
       .sort((a, b) => b.value - a.value);
   };
 
   const chartData = getChartData();
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+
+  // Color mapping for consistent chart colors
+  const getChartColor = (categoryColor: string) => {
+    const colorMap: Record<string, string> = {
+      'bg-orange-100': '#fed7aa',
+      'bg-orange-500': '#f97316',
+      'bg-blue-100': '#dbeafe',
+      'bg-blue-500': '#3b82f6',
+      'bg-green-100': '#dcfce7',
+      'bg-green-500': '#22c55e',
+      'bg-purple-100': '#e9d5ff',
+      'bg-purple-500': '#a855f7',
+      'bg-red-100': '#fee2e2',
+      'bg-red-500': '#ef4444',
+      'bg-pink-100': '#fce7f3',
+      'bg-pink-500': '#ec4899',
+      'bg-gray-100': '#f3f4f6',
+      'bg-gray-500': '#6b7280',
+      'bg-yellow-100': '#fef3c7',
+      'bg-yellow-500': '#eab308',
+      'bg-indigo-100': '#e0e7ff',
+      'bg-indigo-500': '#6366f1',
+      'bg-teal-100': '#ccfbf1',
+      'bg-teal-500': '#14b8a6',
+    };
+    return colorMap[categoryColor] || '#8884d8';
+  };
 
   if (expensesLoading) {
     return (
@@ -103,7 +128,7 @@ export function SpendingChartFirst() {
                 dataKey="value"
               >
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={getChartColor(entry.color)} />
                 ))}
               </Pie>
               <Tooltip 
@@ -128,7 +153,7 @@ export function SpendingChartFirst() {
                 <div className="flex items-center gap-2">
                   <div 
                     className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    style={{ backgroundColor: getChartColor(item.color) }}
                   />
                   <span className="text-slate-600">{item.icon} {item.name}</span>
                 </div>
