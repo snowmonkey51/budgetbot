@@ -1,10 +1,10 @@
 import { BalanceForm } from "@/components/balance-form";
 import { ExpenseForm } from "@/components/expense-form";
-import { ExpenseList } from "@/components/expense-list";
+import { ExpenseListSecond } from "@/components/expense-list-second";
 import { SpendingChart } from "@/components/spending-chart";
 import { Wallet } from "lucide-react";
 
-export default function Budget() {
+export default function BudgetSecond() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
       {/* Left Panel */}
@@ -16,7 +16,7 @@ export default function Budget() {
 
       {/* Right Panel */}
       <div className="lg:col-span-2">
-        <ExpenseList />
+        <ExpenseListSecond />
       </div>
     </div>
   );
