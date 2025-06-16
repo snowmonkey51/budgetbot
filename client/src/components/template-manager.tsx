@@ -233,7 +233,7 @@ export function TemplateManager({ period, onTemplateLoaded }: TemplateManagerPro
       </div>
 
       <div className="grid gap-4">
-        {templates.map((template: Template & { items: TemplateItem[] }) => (
+        {templates.filter((template: Template & { items: TemplateItem[] }) => template.period === period).map((template: Template & { items: TemplateItem[] }) => (
           <div key={template.id} className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium">{template.name}</h4>
