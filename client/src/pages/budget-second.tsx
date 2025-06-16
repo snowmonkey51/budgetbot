@@ -1,7 +1,7 @@
 import { BalanceForm } from "@/components/balance-form";
-import { ExpenseForm } from "@/components/expense-form";
+import { ExpenseFormSecond } from "@/components/expense-form-second";
 import { ExpenseListSecond } from "@/components/expense-list-second";
-import { SpendingChart } from "@/components/spending-chart";
+import { SpendingChartSecond } from "@/components/spending-chart-second";
 import { Wallet } from "lucide-react";
 
 export default function BudgetSecond() {
@@ -10,8 +10,8 @@ export default function BudgetSecond() {
       {/* Left Panel */}
       <div className="lg:col-span-1 space-y-6">
         <BalanceForm />
-        <ExpenseForm />
-        <SpendingChart />
+        <ExpenseFormSecond />
+        <SpendingChartSecond />
       </div>
 
       {/* Right Panel */}
