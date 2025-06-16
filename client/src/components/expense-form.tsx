@@ -107,7 +107,7 @@ export function ExpenseForm() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="expense-amount" className="text-sm font-medium text-slate-700">
                 Amount
@@ -123,7 +123,7 @@ export function ExpenseForm() {
                   min="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="pl-8"
+                  className="pl-8 h-10"
                   placeholder="0.00"
                   required
                 />
@@ -131,14 +131,14 @@ export function ExpenseForm() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-2">
                 <Label htmlFor="expense-category" className="text-sm font-medium text-slate-700">
                   Category
                 </Label>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="text-slate-400 hover:text-blue-600 p-1">
-                      <Settings className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" className="text-slate-400 hover:text-blue-600 p-1 h-6 w-6">
+                      <Settings className="h-3 w-3" />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -150,7 +150,7 @@ export function ExpenseForm() {
                 </Dialog>
               </div>
               <Select value={category} onValueChange={setCategory} required>
-                <SelectTrigger className="mt-2">
+                <SelectTrigger className="h-10">
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
