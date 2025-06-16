@@ -21,7 +21,6 @@ export const expenses = pgTable("expenses", {
   description: text("description").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   category: text("category").notNull(),
-  dueDate: timestamp("due_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

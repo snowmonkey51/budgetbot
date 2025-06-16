@@ -6,21 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { CategoryManager } from "./category-manager";
-import { Plus, Settings, CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Plus, Settings } from "lucide-react";
 import type { InsertExpense, Category } from "@shared/schema";
 
 export function ExpenseForm() {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
-  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -39,7 +34,6 @@ export function ExpenseForm() {
       setDescription("");
       setAmount("");
       setCategory("");
-      setDueDate(undefined);
       toast({
         title: "Expense Added",
         description: "Your expense has been successfully added.",
@@ -89,7 +83,6 @@ export function ExpenseForm() {
       description: description.trim(),
       amount: amount,
       category,
-      dueDate: dueDate || null,
     });
   };
 
@@ -172,34 +165,6 @@ export function ExpenseForm() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div>
-            <Label className="text-sm font-medium text-slate-700">
-              Due Date (Optional)
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full mt-2 justify-start text-left font-normal",
-                    !dueDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dueDate ? format(dueDate, "PPP") : "Select due date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dueDate}
-                  onSelect={setDueDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
           </div>
 
           <Button
