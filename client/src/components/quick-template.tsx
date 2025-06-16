@@ -91,7 +91,7 @@ export function QuickTemplate({ period }: QuickTemplateProps) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="w-full">
           <FileText className="w-4 h-4 mr-2" />
-          Quick Template
+          New Template
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
