@@ -26,12 +26,17 @@ export function SpendingChartFirst() {
   const getChartData = () => {
     if (!expenses || !categories) return [];
 
+    console.log('First Half Chart - Raw expenses:', expenses);
+    console.log('First Half Chart - Categories:', categories);
+
     const spendingByCategory = expenses
       .filter(expense => !expense.cleared)
       .reduce((acc, expense) => {
         const category = categories.find(cat => cat.name.toLowerCase() === expense.category.toLowerCase());
         const categoryName = category?.name || expense.category;
         const amount = parseFloat(expense.amount);
+        
+        console.log(`Processing expense: ${expense.description} - ${expense.category} -> ${categoryName} - $${amount}`);
         
         if (!acc[categoryName]) {
           acc[categoryName] = {
@@ -44,6 +49,8 @@ export function SpendingChartFirst() {
         acc[categoryName].value += amount;
         return acc;
       }, {} as Record<string, { name: string; value: number; color: string; icon: string }>);
+
+    console.log('First Half Chart - Final category totals:', spendingByCategory);
 
     return Object.values(spendingByCategory)
       .filter(item => item.value > 0)
@@ -107,6 +114,8 @@ export function SpendingChartFirst() {
   }
 
   const totalAmount = chartData.reduce((sum, item) => sum + item.value, 0);
+  console.log('First Half Chart - Chart data:', chartData);
+  console.log('First Half Chart - Total amount:', totalAmount);
 
   return (
     <Card>

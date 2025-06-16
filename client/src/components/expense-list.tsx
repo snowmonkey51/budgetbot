@@ -175,9 +175,12 @@ export function ExpenseList() {
 
   const calculateTotalExpenses = () => {
     if (!expenses) return 0;
-    return expenses
+    const total = expenses
       .filter(expense => !expense.cleared)
       .reduce((total, expense) => total + parseFloat(expense.amount), 0);
+    console.log('Expense List - Total expenses:', total);
+    console.log('Expense List - Filtered expenses:', expenses.filter(expense => !expense.cleared));
+    return total;
   };
 
   const calculateSpendableBalance = () => {
