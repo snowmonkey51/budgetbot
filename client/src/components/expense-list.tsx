@@ -363,9 +363,8 @@ export function ExpenseList() {
 
       {/* Spendable Balance Card */}
       <div className="rounded-xl shadow-lg p-6 text-white bg-gradient-to-r from-green-600 to-green-700">
-        <div className="flex items-center justify-end gap-2 mb-2">
+        <div className="flex items-center justify-end mb-2">
           <h3 className="text-sm font-medium text-opacity-90">Spendable Balance</h3>
-          <div className="text-opacity-75">💰</div>
         </div>
         <div className="text-3xl font-bold text-right">
           {formatCurrency(spendableBalance)}
