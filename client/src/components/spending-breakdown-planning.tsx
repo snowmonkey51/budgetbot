@@ -62,36 +62,30 @@ export function SpendingBreakdownPlanning() {
     return Object.values(spendingByCategory).filter(item => item.value > 0);
   };
 
-  const getChartColor = (color: string) => {
+  const getChartColor = (categoryColor: string) => {
     const colorMap: Record<string, string> = {
-      'red': '#ef4444',
-      'blue': '#3b82f6',
-      'green': '#10b981',
-      'yellow': '#f59e0b',
-      'purple': '#8b5cf6',
-      'pink': '#ec4899',
-      'orange': '#f97316',
-      'teal': '#14b8a6',
-      'gray': '#6b7280',
-      'indigo': '#6366f1'
+      'bg-orange-100': '#fed7aa',
+      'bg-orange-500': '#f97316',
+      'bg-blue-100': '#dbeafe',
+      'bg-blue-500': '#3b82f6',
+      'bg-green-100': '#dcfce7',
+      'bg-green-500': '#22c55e',
+      'bg-purple-100': '#e9d5ff',
+      'bg-purple-500': '#a855f7',
+      'bg-red-100': '#fee2e2',
+      'bg-red-500': '#ef4444',
+      'bg-pink-100': '#fce7f3',
+      'bg-pink-500': '#ec4899',
+      'bg-gray-100': '#f3f4f6',
+      'bg-gray-500': '#6b7280',
+      'bg-yellow-100': '#fef3c7',
+      'bg-yellow-500': '#eab308',
+      'bg-indigo-100': '#e0e7ff',
+      'bg-indigo-500': '#6366f1',
+      'bg-teal-100': '#ccfbf1',
+      'bg-teal-500': '#14b8a6',
     };
-    return colorMap[color] || color;
-  };
-
-  const getCategoryColor = (categoryName: string) => {
-    const name = categoryName.toLowerCase();
-    const colorMap: Record<string, string> = {
-      'food': '#f97316',
-      'transport': '#3b82f6', 
-      'shopping': '#10b981',
-      'bills': '#8b5cf6',
-      'entertainment': '#ef4444',
-      'health': '#ec4899',
-      'car': '#ef4444',
-      'subscription': '#3b82f6',
-      'other': '#6b7280'
-    };
-    return colorMap[name] || '#6b7280';
+    return colorMap[categoryColor] || '#8884d8';
   };
 
   const chartData = getChartData();
@@ -150,7 +144,7 @@ export function SpendingBreakdownPlanning() {
                 dataKey="value"
               >
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getCategoryColor(entry.name)} />
+                  <Cell key={`cell-${index}`} fill={getChartColor(entry.color)} />
                 ))}
               </Pie>
               <Tooltip 
@@ -175,7 +169,7 @@ export function SpendingBreakdownPlanning() {
                 <div className="flex items-center gap-2">
                   <div 
                     className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: getCategoryColor(item.name) }}
+                    style={{ backgroundColor: getChartColor(item.color) }}
                   />
                   <span className="text-slate-600">{item.icon} {item.name}</span>
                 </div>
