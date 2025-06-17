@@ -33,7 +33,10 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h1 className="text-xl font-semibold text-slate-900">BudgetBot</h1>
+                <h1 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text tracking-wider font-mono relative">
+                  BudgetBot
+                  <span className="absolute inset-0 text-blue-400 opacity-20 blur-sm">BudgetBot</span>
+                </h1>
               </div>
               
               {/* Navigation Tabs */}
