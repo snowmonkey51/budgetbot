@@ -78,6 +78,22 @@ export function SpendingBreakdownPlanning() {
     return colorMap[color] || color;
   };
 
+  const getCategoryColor = (categoryName: string) => {
+    const name = categoryName.toLowerCase();
+    const colorMap: Record<string, string> = {
+      'food': '#f97316',
+      'transport': '#3b82f6', 
+      'shopping': '#10b981',
+      'bills': '#8b5cf6',
+      'entertainment': '#ef4444',
+      'health': '#ec4899',
+      'car': '#ef4444',
+      'subscription': '#3b82f6',
+      'other': '#6b7280'
+    };
+    return colorMap[name] || '#6b7280';
+  };
+
   const chartData = getChartData();
 
   if (expensesLoading) {
@@ -134,7 +150,7 @@ export function SpendingBreakdownPlanning() {
                 dataKey="value"
               >
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getChartColor(entry.color)} />
+                  <Cell key={`cell-${index}`} fill={getCategoryColor(entry.name)} />
                 ))}
               </Pie>
               <Tooltip 
@@ -159,7 +175,7 @@ export function SpendingBreakdownPlanning() {
                 <div className="flex items-center gap-2">
                   <div 
                     className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: getChartColor(item.color) }}
+                    style={{ backgroundColor: getCategoryColor(item.name) }}
                   />
                   <span className="text-slate-600">{item.icon} {item.name}</span>
                 </div>
