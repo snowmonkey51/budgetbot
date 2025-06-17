@@ -11,7 +11,7 @@ export default function Budget() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
       {/* Left Panel */}
       <div className="lg:col-span-1 space-y-6">
-        <BalanceForm />
+        <BalanceForm period="first-half" />
         <ExpenseForm />
         <div className="flex gap-2">
           <QuickTemplate period="first-half" />

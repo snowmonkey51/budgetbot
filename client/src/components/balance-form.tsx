@@ -10,23 +10,32 @@ import { formatCurrency } from "@/lib/utils";
 import { Edit } from "lucide-react";
 import type { Balance } from "@shared/schema";
 
-export function BalanceForm() {
+interface BalanceFormProps {
+  period?: string;
+}
+
+export function BalanceForm({ period = "first-half" }: BalanceFormProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [amount, setAmount] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: balance, isLoading } = useQuery<Balance | null>({
-    queryKey: ["/api/balance"],
+    queryKey: ["/api/balance", period],
+    queryFn: async () => {
+      const response = await fetch(`/api/balance?period=${period}`);
+      if (!response.ok) throw new Error('Failed to fetch balance');
+      return response.json();
+    }
   });
 
   const updateBalanceMutation = useMutation({
     mutationFn: async (amount: string) => {
-      const response = await apiRequest("PUT", "/api/balance", { amount });
+      const response = await apiRequest("PUT", "/api/balance", { amount, period });
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/balance", period] });
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
       setIsEditing(false);
       toast({

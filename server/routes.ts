@@ -8,7 +8,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current balance
   app.get("/api/balance", async (req, res) => {
     try {
-      const balance = await storage.getCurrentBalance();
+      const period = req.query.period as string || "first-half";
+      const balance = await storage.getCurrentBalance(period);
       res.json(balance);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch balance" });
