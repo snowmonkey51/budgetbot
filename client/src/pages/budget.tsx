@@ -1,5 +1,5 @@
 import { BalanceForm } from "@/components/balance-form";
-import { ExpenseForm } from "@/components/expense-form";
+import { ExpenseFormFirst } from "@/components/expense-form-first";
 import { ExpenseList } from "@/components/expense-list";
 import { SpendingChartFirst } from "@/components/spending-chart-first";
 import { QuickTemplate } from "@/components/quick-template";
@@ -12,6 +12,7 @@ export default function Budget() {
       {/* Left Panel */}
       <div className="lg:col-span-1 space-y-6">
         <BalanceForm period="first-half" />
+        <ExpenseFormFirst />
         <div className="flex gap-2">
           <QuickTemplate period="first-half" />
           <TemplateLoader period="first-half" />
