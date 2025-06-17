@@ -33,9 +33,11 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h1 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text tracking-wider font-mono relative">
-                  BudgetBot
-                  <span className="absolute inset-0 text-blue-400 opacity-20 blur-sm">BudgetBot</span>
+                <h1 className="text-xl font-bold text-slate-800 tracking-widest uppercase relative transform hover:scale-105 transition-transform duration-300">
+                  <span className="relative z-10 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent drop-shadow-lg">
+                    BudgetBot
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 blur-sm transform translate-x-0.5 translate-y-0.5"></div>
                 </h1>
               </div>
               
