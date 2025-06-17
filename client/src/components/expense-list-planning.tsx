@@ -537,8 +537,16 @@ export function ExpenseListPlanning() {
           </p>
         </div>
         
-        {/* Glowing bottom edge */}
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"></div>
+        {/* Large progress bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-6 bg-black bg-opacity-30">
+          <div 
+            className="h-full bg-white transition-all duration-700 ease-out shadow-lg"
+            style={{
+              width: balance ? `${Math.min((totalExpenses / parseFloat(balance.amount)) * 100, 100)}%` : '0%',
+              boxShadow: '0 0 15px rgba(255,255,255,0.6)'
+            }}
+          />
+        </div>
       </div>
     </div>
   );
