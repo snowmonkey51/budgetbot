@@ -12,6 +12,7 @@ import BudgetSecond from "@/pages/budget-second";
 import BudgetPlanning from "@/pages/budget-planning";
 import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
+import budgetBotIcon from "@assets/budgetboticon_1750169307242.png";
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -27,7 +28,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
                   <img 
-                    src="/attached_assets/budgetboticon_1750169307242.png" 
+                    src={budgetBotIcon} 
                     alt="BudgetBot" 
                     className="w-full h-full object-cover"
                   />
