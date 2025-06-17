@@ -32,7 +32,12 @@ export function ExpenseList() {
   });
 
   const { data: balance } = useQuery<Balance | null>({
-    queryKey: ["/api/balance"],
+    queryKey: ["/api/balance", "first-half"],
+    queryFn: async () => {
+      const response = await fetch(`/api/balance?period=first-half`);
+      if (!response.ok) throw new Error('Failed to fetch balance');
+      return response.json();
+    }
   });
 
   const { data: categories } = useQuery<Category[]>({
