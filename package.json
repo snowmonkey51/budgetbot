@@ -106,5 +106,8 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
-  }
+  },
+  "main": "electron/main.cjs",
+  "description": "BudgetBot - Personal budgeting application for macOS",
+  "author": "BudgetBot Team"
 }

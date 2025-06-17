@@ -1,15 +1,8 @@
-const { contextBridge, ipcRenderer } = require('electron');
+// Preload script for BudgetBot Electron app
+const { contextBridge } = require('electron');
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
+// Expose safe APIs to the renderer process
 contextBridge.exposeInMainWorld('electronAPI', {
-  openExternal: (url) => ipcRenderer.invoke('open-external', url),
-  getVersion: () => ipcRenderer.invoke('get-version'),
-  platform: process.platform
+  platform: process.platform,
+  version: process.versions.electron
 });
-
-// Disable node integration in renderer for security
-window.nodeRequire = require;
-delete window.require;
-delete window.exports;
-delete window.module;
