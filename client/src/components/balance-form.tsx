@@ -119,7 +119,7 @@ export function BalanceForm() {
             <div className="flex gap-2">
               <Button
                 type="submit"
-                className="flex-1 bg-white text-blue-700 hover:bg-white/90"
+                className="flex-1 bg-white text-blue-600 hover:bg-blue-50 border-0 shadow-sm font-medium rounded-lg"
                 disabled={updateBalanceMutation.isPending}
               >
                 {updateBalanceMutation.isPending ? "Updating..." : "Update Balance"}
@@ -129,7 +129,7 @@ export function BalanceForm() {
                 variant="outline"
                 onClick={() => setIsEditing(false)}
                 disabled={updateBalanceMutation.isPending}
-                className="border-white/30 text-blue-100 hover:bg-white/10 hover:text-blue-50"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 shadow-sm font-medium rounded-lg"
               >
                 Cancel
               </Button>
