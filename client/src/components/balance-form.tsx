@@ -129,7 +129,7 @@ export function BalanceForm() {
                 variant="outline"
                 onClick={() => setIsEditing(false)}
                 disabled={updateBalanceMutation.isPending}
-                className="border-white/30 text-white hover:bg-white/10"
+                className="border-white/30 text-blue-100 hover:bg-white/10 hover:text-blue-50"
               >
                 Cancel
               </Button>
