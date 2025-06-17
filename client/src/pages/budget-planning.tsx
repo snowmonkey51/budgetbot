@@ -1,6 +1,7 @@
 import { BalanceForm } from "@/components/balance-form";
 import { ExpenseFormPlanning } from "@/components/expense-form-planning";
 import { ExpenseListPlanning } from "@/components/expense-list-planning";
+import { SpendingBreakdownPlanning } from "@/components/spending-breakdown-planning";
 import { QuickTemplate } from "@/components/quick-template";
 import { TemplateLoader } from "@/components/template-loader";
 import { Wallet } from "lucide-react";
@@ -16,6 +17,7 @@ export default function BudgetPlanning() {
           <QuickTemplate period="planning" />
           <TemplateLoader period="planning" />
         </div>
+        <SpendingBreakdownPlanning />
       </div>
 
       {/* Right Panel */}
