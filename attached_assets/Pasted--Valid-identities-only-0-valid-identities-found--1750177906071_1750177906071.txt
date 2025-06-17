@@ -1,0 +1,24 @@
+                                               Valid identities only
+     0 valid identities found
+  • building        target=DMG arch=arm64 file=dist-electron/BudgetBot-1.0.0-arm64.dmg
+  • building        target=macOS zip arch=arm64 file=dist-electron/BudgetBot-1.0.0-arm64-mac.zip
+  ⨯ ENOENT: no such file or directory, stat '/Users/aaronbevill/Downloads/BudgetBot/assets/dmg-background.png'  failedTask=build stackTrace=Error: ENOENT: no such file or directory, stat '/Users/aaronbevill/Downloads/BudgetBot/assets/dmg-background.png'
+  • Above command failed, retrying 5 more times
+  ⨯ unable to execute hdiutil  args=["create","-srcfolder","/Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app","-volname","BudgetBot 1.0.0","-anyowners","-nospotlight","-format","UDRW","-quiet","-fs","APFS","/private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg"] code=undefined error=Exit code: 1. Command failed: hdiutil create -srcfolder /Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app -volname BudgetBot 1.0.0 -anyowners -nospotlight -format UDRW -quiet -fs APFS /private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg
+
+  • Above command failed, retrying 5 more times
+  ⨯ unable to execute hdiutil  args=["create","-srcfolder","/Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app","-volname","BudgetBot 1.0.0","-anyowners","-nospotlight","-format","UDRW","-quiet","-fs","APFS","/private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg"] code=undefined error=Exit code: 1. Command failed: hdiutil create -srcfolder /Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app -volname BudgetBot 1.0.0 -anyowners -nospotlight -format UDRW -quiet -fs APFS /private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg
+
+  • building block map  blockMapFile=dist-electron/BudgetBot-1.0.0-mac.zip.blockmap
+  • Above command failed, retrying 5 more times
+  ⨯ unable to execute hdiutil  args=["create","-srcfolder","/Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app","-volname","BudgetBot 1.0.0","-anyowners","-nospotlight","-format","UDRW","-quiet","-fs","APFS","/private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg"] code=undefined error=Exit code: 1. Command failed: hdiutil create -srcfolder /Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app -volname BudgetBot 1.0.0 -anyowners -nospotlight -format UDRW -quiet -fs APFS /private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg
+
+  • Above command failed, retrying 5 more times
+  ⨯ unable to execute hdiutil  args=["create","-srcfolder","/Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app","-volname","BudgetBot 1.0.0","-anyowners","-nospotlight","-format","UDRW","-quiet","-fs","APFS","/private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg"] code=undefined error=Exit code: 1. Command failed: hdiutil create -srcfolder /Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app -volname BudgetBot 1.0.0 -anyowners -nospotlight -format UDRW -quiet -fs APFS /private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg
+
+  • building block map  blockMapFile=dist-electron/BudgetBot-1.0.0-arm64-mac.zip.blockmap
+  • Above command failed, retrying 5 more times
+  ⨯ unable to execute hdiutil  args=["create","-srcfolder","/Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app","-volname","BudgetBot 1.0.0","-anyowners","-nospotlight","-format","UDRW","-quiet","-fs","APFS","/private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg"] code=undefined error=Exit code: 1. Command failed: hdiutil create -srcfolder /Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app -volname BudgetBot 1.0.0 -anyowners -nospotlight -format UDRW -quiet -fs APFS /private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg
+
+  • Above command failed, retrying 5 more times
+  ⨯ unable to execute hdiutil  args=["create","-srcfolder","/Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app","-volname","BudgetBot 1.0.0","-anyowners","-nospotlight","-format","UDRW","-quiet","-fs","APFS","/private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg"] code=undefined error=Exit code: 1. Command failed: hdiutil create -srcfolder /Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac-arm64/BudgetBot.app -volname BudgetBot 1.0.0 -anyowners -nospotlight -format UDRW -quiet -fs APFS /private/var/folders/cw/_wnqgd4117l217bkr46xb0lr0000gn/T/t-GDpdWf/5.dmg
