@@ -123,44 +123,11 @@ export function SpendingChartPlanning() {
     <Card>
       <CardHeader>
         <CardTitle>
-          Spending Overview
+          Category Breakdown
         </CardTitle>
       </CardHeader>
       <CardContent>
-          <div className="space-y-4">
-            {/* Summary Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="text-center">
-          <p className="text-sm text-slate-500">Total Planned</p>
-          <p className="text-xl font-bold text-slate-900">{formatCurrency(totalSpent)}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-sm text-slate-500">Remaining</p>
-          <p className={`text-xl font-bold ${spendableBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {formatCurrency(spendableBalance)}
-          </p>
-        </div>
-      </div>
-
-      {/* Spending Percentage Indicator */}
-      <div className="bg-slate-50 rounded-lg p-4 mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-slate-700">Budget Usage</span>
-          <span className={`text-sm font-bold ${spendingPercentage > 80 ? 'text-red-600' : spendingPercentage > 60 ? 'text-yellow-600' : 'text-green-600'}`}>
-            {spendingPercentage.toFixed(1)}% {spendingPercentage > 80 ? '⚠️' : ''}
-          </span>
-        </div>
-        <div className="w-full bg-slate-200 rounded-full h-2">
-          <div 
-            className={`h-2 rounded-full transition-all duration-300 ${
-              spendingPercentage > 80 ? 'bg-red-500' : 
-              spendingPercentage > 60 ? 'bg-yellow-500' : 'bg-green-500'
-            }`}
-            style={{ width: `${Math.min(spendingPercentage, 100)}%` }}
-          ></div>
-        </div>
-      </div>
-
+        <div className="space-y-4">
           {/* Pie Chart */}
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
