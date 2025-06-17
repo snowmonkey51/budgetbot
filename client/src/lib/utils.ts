@@ -69,3 +69,29 @@ export const categoryBackgroundColors: Record<string, string> = {
   health: 'bg-pink-50 hover:bg-pink-100',
   other: 'bg-gray-50 hover:bg-gray-100',
 };
+
+export function getCategoryColor(categoryColor: string): string {
+  const colorMap: Record<string, string> = {
+    'bg-orange-100': '#fed7aa',
+    'bg-orange-500': '#f97316',
+    'bg-blue-100': '#dbeafe',
+    'bg-blue-500': '#3b82f6',
+    'bg-green-100': '#dcfce7',
+    'bg-green-500': '#22c55e',
+    'bg-purple-100': '#e9d5ff',
+    'bg-purple-500': '#a855f7',
+    'bg-red-100': '#fee2e2',
+    'bg-red-500': '#ef4444',
+    'bg-pink-100': '#fce7f3',
+    'bg-pink-500': '#ec4899',
+    'bg-gray-100': '#f3f4f6',
+    'bg-gray-500': '#6b7280',
+    'bg-yellow-100': '#fef3c7',
+    'bg-yellow-500': '#eab308',
+    'bg-indigo-100': '#e0e7ff',
+    'bg-indigo-500': '#6366f1',
+    'bg-teal-100': '#ccfbf1',
+    'bg-teal-500': '#14b8a6',
+  };
+  return colorMap[categoryColor] || '#8884d8';
+}
