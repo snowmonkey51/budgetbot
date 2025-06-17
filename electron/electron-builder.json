@@ -1,0 +1,72 @@
+{
+  "appId": "com.budgetbot.app",
+  "productName": "BudgetBot",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/main.js",
+    "electron/preload.js",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "assets",
+      "to": "assets",
+      "filter": ["**/*"]
+    }
+  ],
+  "mac": {
+    "category": "public.app-category.finance",
+    "icon": "assets/budgetbot-icon.icns",
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "minimumSystemVersion": "10.14.0",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "assets/entitlements.mac.plist",
+    "entitlementsInherit": "assets/entitlements.mac.plist"
+  },
+  "dmg": {
+    "title": "BudgetBot ${version}",
+    "icon": "assets/budgetbot-icon.icns",
+    "background": "assets/dmg-background.png",
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
+  },
+  "win": {
+    "target": "nsis",
+    "icon": "assets/budgetbot-icon.ico"
+  },
+  "linux": {
+    "target": "AppImage",
+    "icon": "assets/budgetbot-icon.png",
+    "category": "Office"
+  },
+  "publish": {
+    "provider": "github"
+  }
+}
