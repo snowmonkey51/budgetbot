@@ -94,27 +94,9 @@ export function ExpenseForm() {
 
   return (
     <Card>
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CardHeader className="pb-3">
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
-            >
-              <h2 className="text-lg font-semibold text-slate-900">Add New Expense</h2>
-              {isOpen ? (
-                <ChevronUp className="h-4 w-4 text-slate-500" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-slate-500" />
-              )}
-            </Button>
-          </CollapsibleTrigger>
-        </CardHeader>
-
-        <CollapsibleContent>
-          <CardContent className="pt-0 px-6 pb-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
             <Label htmlFor="expense-description" className="text-sm font-medium text-slate-700">
               Description
             </Label>
@@ -188,34 +170,32 @@ export function ExpenseForm() {
                 </SelectContent>
               </Select>
             </div>
-
-            <div>
-              <Label htmlFor="expense-notes" className="text-sm font-medium text-slate-700">
-                Notes (optional)
-              </Label>
-              <Textarea
-                id="expense-notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="mt-1 h-20"
-                placeholder="Add any additional notes..."
-                spellCheck={true}
-              />
-            </div>
           </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-green-600 hover:bg-green-700"
-                disabled={createExpenseMutation.isPending}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {createExpenseMutation.isPending ? "Adding..." : "Add Expense"}
-              </Button>
-            </form>
-          </CardContent>
-        </CollapsibleContent>
-      </Collapsible>
+          <div>
+            <Label htmlFor="expense-notes" className="text-sm font-medium text-slate-700">
+              Notes (optional)
+            </Label>
+            <Textarea
+              id="expense-notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="mt-1 h-20"
+              placeholder="Add any additional notes..."
+              spellCheck={true}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-green-600 hover:bg-green-700"
+            disabled={createExpenseMutation.isPending}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {createExpenseMutation.isPending ? "Adding..." : "Add Expense"}
+          </Button>
+        </form>
+      </CardContent>
     </Card>
   );
 }
