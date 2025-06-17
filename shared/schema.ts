@@ -5,6 +5,7 @@ import { z } from "zod";
 export const balance = pgTable("balance", {
   id: serial("id").primaryKey(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  period: text("period").notNull().default("first-half"), // "first-half", "second-half", "planning"
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 

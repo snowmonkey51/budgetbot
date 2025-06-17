@@ -20,7 +20,7 @@ import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // Balance operations
-  getCurrentBalance(): Promise<Balance | null>;
+  getCurrentBalance(period?: string): Promise<Balance | null>;
   updateBalance(balance: InsertBalance): Promise<Balance>;
   
   // Category operations
@@ -48,14 +48,14 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getCurrentBalance(): Promise<Balance | null> {
-    const [balanceRecord] = await db.select().from(balance).limit(1);
+  async getCurrentBalance(period = "first-half"): Promise<Balance | null> {
+    const [balanceRecord] = await db.select().from(balance).where(eq(balance.period, period)).limit(1);
     return balanceRecord || null;
   }
 
   async updateBalance(insertBalance: InsertBalance): Promise<Balance> {
-    // Check if balance record exists
-    const existing = await this.getCurrentBalance();
+    // Check if balance record exists for this period
+    const existing = await this.getCurrentBalance(insertBalance.period);
     
     if (existing) {
       const [updated] = await db
@@ -244,23 +244,29 @@ export class DatabaseStorage implements IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private balance: Balance | null = null;
+  private balances: Map<string, Balance> = new Map();
   private categories: Map<number, Category> = new Map();
   private expenses: Map<number, Expense> = new Map();
   private templates: Map<number, Template> = new Map();
   private templateItems: Map<number, TemplateItem> = new Map();
+  private currentBalanceId: number = 1;
   private currentCategoryId: number = 1;
   private currentExpenseId: number = 1;
   private currentTemplateId: number = 1;
   private currentTemplateItemId: number = 1;
 
   constructor() {
-    // Initialize with default balance
-    this.balance = {
-      id: 1,
-      amount: "0.00",
-      updatedAt: new Date()
-    };
+    // Initialize with default balances for each period
+    const periods = ["first-half", "second-half", "planning"];
+    periods.forEach((period) => {
+      const balance: Balance = {
+        id: this.currentBalanceId++,
+        amount: "0.00",
+        period,
+        updatedAt: new Date()
+      };
+      this.balances.set(period, balance);
+    });
 
     // Initialize with default categories
     const defaultCategories = [
@@ -285,17 +291,23 @@ export class MemStorage implements IStorage {
     });
   }
 
-  async getCurrentBalance(): Promise<Balance | null> {
-    return this.balance;
+  async getCurrentBalance(period = "first-half"): Promise<Balance | null> {
+    return this.balances.get(period) || null;
   }
 
   async updateBalance(insertBalance: InsertBalance): Promise<Balance> {
-    this.balance = {
-      id: 1,
+    const period = insertBalance.period || "first-half";
+    const existingBalance = this.balances.get(period);
+    
+    const updatedBalance: Balance = {
+      id: existingBalance?.id || this.currentBalanceId++,
       amount: insertBalance.amount,
+      period,
       updatedAt: new Date()
     };
-    return this.balance;
+    
+    this.balances.set(period, updatedBalance);
+    return updatedBalance;
   }
 
   async getCategories(): Promise<Category[]> {
