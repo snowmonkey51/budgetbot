@@ -12,7 +12,7 @@ import BudgetSecond from "@/pages/budget-second";
 import BudgetPlanning from "@/pages/budget-planning";
 import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
-import budgetBotIcon from "@assets/budgetboticon_1750169307242.png";
+import budgetBotIcon from "@assets/budgetbot2_1750169520225.png";
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
