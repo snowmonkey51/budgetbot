@@ -9,6 +9,9 @@ if [ ! -d "/Applications/BudgetBot-macOS-Final" ]; then
     exit 1
 fi
 
+# Add common Node.js paths to PATH
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+
 # Check if Node.js is available
 if ! command -v node &> /dev/null; then
     osascript -e 'display dialog "Node.js is required but not found.\n\nPlease install Node.js 18+ from nodejs.org" with title "BudgetBot" buttons {"OK"} default button "OK"'
@@ -26,6 +29,7 @@ if [ ! -d "node_modules" ]; then
 fi
 
 # Start BudgetBot in background
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
 npm run dev &
 NODE_PID=$!
 
