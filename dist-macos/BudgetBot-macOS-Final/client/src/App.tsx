@@ -12,7 +12,7 @@ import BudgetSecond from "@/pages/budget-second";
 import BudgetPlanning from "@/pages/budget-planning";
 import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
-import budgetBotIcon from "@assets/budgetbot2_1750169520225.png";
+// Robot icon for macOS distribution - no external assets needed
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -26,12 +26,8 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-lg overflow-hidden">
-                  <img 
-                    src={budgetBotIcon} 
-                    alt="BudgetBot" 
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white text-lg">
+                  🤖
                 </div>
                 <h1 className="text-xl font-bold text-slate-700 tracking-widest uppercase relative transform hover:scale-105 transition-transform duration-300">
                   BudgetBot
