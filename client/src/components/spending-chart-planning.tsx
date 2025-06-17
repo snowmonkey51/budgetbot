@@ -187,12 +187,12 @@ export function SpendingChartPlanning() {
           </div>
 
           {/* Category Breakdown */}
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-slate-700 mb-3">Category Breakdown</h4>
+          <div className="space-y-1">
+            <h4 className="text-sm font-medium text-slate-700 mb-2">Category Breakdown</h4>
             {chartData
               .sort((a, b) => b.value - a.value)
               .map((category, index) => (
-              <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50">
+              <div key={index} className="flex items-center justify-between py-1 rounded-lg hover:bg-slate-50">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{category.icon}</span>
                   <span className="text-sm font-medium text-slate-700">{category.name}</span>

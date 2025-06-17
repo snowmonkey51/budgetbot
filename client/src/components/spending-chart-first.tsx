@@ -164,11 +164,11 @@ export function SpendingChartFirst() {
           </ResponsiveContainer>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           {chartData.slice(0, 4).map((item, index) => {
             const percentage = (item.value / totalAmount) * 100;
             return (
-              <div key={item.name} className="flex items-center justify-between text-xs">
+              <div key={item.name} className="flex items-center justify-between text-xs py-1">
                 <div className="flex items-center gap-2">
                   <div 
                     className="w-3 h-3 rounded-full" 

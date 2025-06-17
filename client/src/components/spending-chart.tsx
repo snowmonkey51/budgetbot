@@ -116,9 +116,9 @@ export function SpendingChart() {
               </ResponsiveContainer>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               {chartData.map((item) => (
-                <div key={item.name} className="flex items-center justify-between">
+                <div key={item.name} className="flex items-center justify-between py-1">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{item.icon}</span>
                     <span className="text-sm font-medium text-slate-700">{item.name}</span>
@@ -135,7 +135,7 @@ export function SpendingChart() {
               ))}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-slate-200">
+            <div className="mt-3 pt-3 border-t border-slate-200">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-slate-700">Total Spending</span>
                 <span className="text-lg font-bold text-slate-900">{formatCurrency(totalSpending)}</span>
