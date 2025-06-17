@@ -123,7 +123,7 @@ export function SpendingChartPlanning() {
     <Card>
       <CardHeader>
         <CardTitle>
-          Category Breakdown
+          Spending Chart
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -153,26 +153,7 @@ export function SpendingChartPlanning() {
             </ResponsiveContainer>
           </div>
 
-          {/* Category Breakdown */}
-          <div className="space-y-1">
-            <h4 className="text-sm font-medium text-slate-700 mb-2">Category Breakdown</h4>
-            {chartData
-              .sort((a, b) => b.value - a.value)
-              .map((category, index) => (
-              <div key={index} className="flex items-center justify-between py-1 rounded-lg hover:bg-slate-50">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{category.icon}</span>
-                  <span className="text-sm font-medium text-slate-700">{category.name}</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-semibold text-slate-900">{formatCurrency(category.value)}</span>
-                  <div className="text-xs text-slate-500">
-                    {((category.value / totalSpent) * 100).toFixed(1)}%
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+
         </div>
       </CardContent>
     </Card>
