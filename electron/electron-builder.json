@@ -6,10 +6,13 @@
   },
   "files": [
     "dist/**/*",
-    "electron/main.js",
-    "electron/preload.js",
-    "package.json"
+    "electron/**/*",
+    "package.json",
+    "node_modules/**/*"
   ],
+  "extraMetadata": {
+    "main": "electron/main.js"
+  },
   "extraResources": [
     {
       "from": "assets",

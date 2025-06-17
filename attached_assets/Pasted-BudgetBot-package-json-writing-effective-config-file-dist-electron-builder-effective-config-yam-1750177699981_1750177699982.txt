@@ -1,0 +1,22 @@
+BudgetBot/package.json
+  • writing effective config  file=dist-electron/builder-effective-config.yaml
+  • executing @electron/rebuild  electronVersion=36.4.0 arch=x64 buildFromSource=false appDir=./
+  • installing native dependencies  arch=x64
+  • preparing       moduleName=bufferutil arch=x64
+  • finished        moduleName=bufferutil arch=x64
+  • completed installing native dependencies
+  • packaging       platform=darwin arch=x64 electron=36.4.0 appOutDir=dist-electron/mac
+  • default Electron icon is used  reason=application icon is not set
+  • Cannot detect repository by .git/config. Please specify "repository" in the package.json (https://docs.npmjs.com/files/package.json#repository).
+Please see https://electron.build/publish
+  ⨯ Application entry file "index.js" in the "/Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac/BudgetBot.app/Contents/Resources/app.asar" is corrupted: Error: "index.js" was not found in this archive  failedTask=build stackTrace=Error: Application entry file "index.js" in the "/Users/aaronbevill/Downloads/BudgetBot/dist-electron/mac/BudgetBot.app/Contents/Resources/app.asar" is corrupted: Error: "index.js" was not found in this archive
+    at error (/Users/aaronbevill/Downloads/BudgetBot/node_modules/app-builder-lib/src/asar/asarFileChecker.ts:6:12)
+    at checkFileInArchive (/Users/aaronbevill/Downloads/BudgetBot/node_modules/app-builder-lib/src/asar/asarFileChecker.ts:15:11)
+    at MacPackager.checkFileInPackage (/Users/aaronbevill/Downloads/BudgetBot/node_modules/app-builder-lib/src/platformPackager.ts:638:25)
+    at MacPackager.sanityCheckPackage (/Users/aaronbevill/Downloads/BudgetBot/node_modules/app-builder-lib/src/platformPackager.ts:686:16)
+    at MacPackager.doPack (/Users/aaronbevill/Downloads/BudgetBot/node_modules/app-builder-lib/src/platformPackager.ts:358:5)
+    at MacPackager.pack (/Users/aaronbevill/Downloads/BudgetBot/node_modules/app-builder-lib/src/macPackager.ts:219:9)
+    at Packager.doBuild (/Users/aaronbevill/Downloads/BudgetBot/node_modules/app-builder-lib/src/packager.ts:491:9)
+    at executeFinally (/Users/aaronbevill/Downloads/BudgetBot/node_modules/builder-util/src/promise.ts:12:14)
+    at Packager.build (/Users/aaronbevill/Downloads/BudgetBot/node_modules/app-builder-lib/src/packager.ts:425:31)
+    at executeFinally (/Users/aaronbevill/Downloads/BudgetBot/node_modules/builder-util/src/promise.ts:12:14)
