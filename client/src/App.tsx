@@ -25,12 +25,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C10.89 2 10 2.89 10 4V7H8C6.89 7 6 7.89 6 9V11C6 12.11 6.89 13 8 13H10V14C10 15.11 10.89 16 12 16S14 15.11 14 14V13H16C17.11 13 18 12.11 18 11V9C18 7.89 17.11 7 16 7H14V4C14 2.89 13.11 2 12 2ZM8 9H16V11H8V9ZM10 4H14V7H10V4Z"/>
-                    <circle cx="9" cy="10" r="0.5"/>
-                    <circle cx="15" cy="10" r="0.5"/>
-                  </svg>
+                <div className="w-8 h-8 rounded-lg overflow-hidden">
+                  <img 
+                    src="/attached_assets/budgetbot icon_1750169109872.png" 
+                    alt="BudgetBot" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h1 className="text-xl font-semibold text-slate-900">BudgetBot</h1>
               </div>
