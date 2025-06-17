@@ -21,7 +21,8 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      webSecurity: true
+      webSecurity: true,
+      preload: path.join(__dirname, 'preload.js')
     },
     titleBarStyle: 'hiddenInset',
     show: false // Don't show until ready
