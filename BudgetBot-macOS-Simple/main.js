@@ -1,14 +1,3 @@
-#!/bin/bash
-# Simple setup script for BudgetBot macOS
-
-echo "Setting up BudgetBot for macOS..."
-
-# Create a clean directory
-mkdir -p ~/Desktop/BudgetBot-macOS
-cd ~/Desktop/BudgetBot-macOS
-
-# Create the main Electron file
-cat > main.js << 'EOF'
 const { app, BrowserWindow, Menu } = require('electron');
 
 let mainWindow;
@@ -28,7 +17,6 @@ function createWindow() {
 
   createMenu();
   
-  // Connect to your BudgetBot
   mainWindow.loadURL('https://e286f078-dea3-4595-baaf-ef1a050f4137-00-2a8svkr6avg0t.spock.replit.dev');
   
   mainWindow.once('ready-to-show', () => {
@@ -87,42 +75,3 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
-EOF
-
-# Create package.json
-cat > package.json << 'EOF'
-{
-  "name": "budgetbot-macos",
-  "version": "1.0.0",
-  "description": "BudgetBot for macOS",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron main.js"
-  },
-  "dependencies": {
-    "electron": "^25.0.0"
-  }
-}
-EOF
-
-# Create simple launch script
-cat > launch-budgetbot.command << 'EOF'
-#!/bin/bash
-cd "$(dirname "$0")"
-npm start
-EOF
-
-chmod +x launch-budgetbot.command
-
-echo ""
-echo "✅ BudgetBot setup complete!"
-echo ""
-echo "📍 Location: ~/Desktop/BudgetBot-macOS"
-echo ""
-echo "🚀 To run BudgetBot:"
-echo "   1. Open Terminal"
-echo "   2. cd ~/Desktop/BudgetBot-macOS"
-echo "   3. npm install"
-echo "   4. npm start"
-echo ""
-echo "Or double-click launch-budgetbot.command"

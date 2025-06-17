@@ -1,124 +1,138 @@
 #!/bin/bash
+# BudgetBot macOS Installation Script
 
-# BudgetBot macOS Automated Installer
-# This script downloads and sets up BudgetBot for local use on macOS
-
-set -e
-
-INSTALL_DIR="$HOME/Applications/BudgetBot"
-TEMP_DIR="/tmp/budgetbot-install"
-
-echo "🤖 BudgetBot macOS Installer"
-echo "==========================="
-echo ""
-
-# Check system requirements
-echo "Checking system requirements..."
-
-# Check macOS version
-SW_VERS=$(sw_vers -productVersion)
-echo "✅ macOS $SW_VERS detected"
+echo "Installing BudgetBot for macOS..."
 
 # Check if Node.js is installed
 if ! command -v node &> /dev/null; then
-    echo "❌ Node.js is required but not installed"
-    echo ""
-    echo "Please install Node.js first:"
-    echo "1. Visit https://nodejs.org/"
-    echo "2. Download and install Node.js 18 or later"
-    echo "3. Run this installer again"
-    echo ""
-    open "https://nodejs.org/"
+    echo "Node.js is required but not installed."
+    echo "Please install from: https://nodejs.org"
     exit 1
 fi
-
-NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
-if [ "$NODE_VERSION" -lt 18 ]; then
-    echo "❌ Node.js version $NODE_VERSION is too old (requires 18+)"
-    echo "Please update Node.js from https://nodejs.org/"
-    exit 1
-fi
-
-echo "✅ Node.js $(node --version) is compatible"
 
 # Create installation directory
-echo ""
-echo "Setting up installation directory..."
+INSTALL_DIR="$HOME/Desktop/BudgetBot"
 mkdir -p "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
-# Copy application files if running from source
-if [ -f "$(dirname "$0")/package.json" ]; then
-    echo "Installing from local source..."
-    cp -r "$(dirname "$0")"/* .
-else
-    echo "❌ Source files not found"
-    echo "Please run this script from the BudgetBot directory"
-    exit 1
-fi
+# Create main.js
+cat > main.js << 'EOF'
+const { app, BrowserWindow, Menu } = require('electron');
 
-# Install dependencies
-echo ""
-echo "Installing application dependencies..."
-npm install --production
+let mainWindow;
 
-# Create .env file
-if [ ! -f .env ]; then
-    cat > .env << 'EOL'
-# BudgetBot Configuration for macOS
-NODE_ENV=production
-PORT=5000
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    minWidth: 800,
+    minHeight: 600,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    },
+    titleBarStyle: 'hiddenInset',
+    icon: __dirname + '/icon.png'
+  });
 
-# Storage: Uses in-memory storage by default
-# For PostgreSQL: uncomment and configure the line below
-# DATABASE_URL=postgresql://username:password@localhost:5432/budgetbot
-EOL
-    echo "✅ Created configuration file"
-fi
+  createMenu();
+  
+  mainWindow.loadURL('https://e286f078-dea3-4595-baaf-ef1a050f4137-00-2a8svkr6avg0t.spock.replit.dev');
+  
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
+}
 
-# Create desktop shortcut
-echo ""
-echo "Creating desktop shortcut..."
-DESKTOP_FILE="$HOME/Desktop/BudgetBot.command"
-cat > "$DESKTOP_FILE" << EOL
+function createMenu() {
+  const template = [
+    {
+      label: 'BudgetBot',
+      submenu: [
+        { label: 'About BudgetBot', role: 'about' },
+        { type: 'separator' },
+        { label: 'Hide BudgetBot', accelerator: 'Cmd+H', role: 'hide' },
+        { label: 'Quit', accelerator: 'Cmd+Q', click: () => app.quit() }
+      ]
+    },
+    {
+      label: 'Budget',
+      submenu: [
+        {
+          label: 'First Half',
+          accelerator: 'Cmd+1',
+          click: () => mainWindow.webContents.executeJavaScript("window.location.hash = '/'")
+        },
+        {
+          label: 'Second Half', 
+          accelerator: 'Cmd+2',
+          click: () => mainWindow.webContents.executeJavaScript("window.location.hash = '/second-half'")
+        },
+        {
+          label: 'Planning',
+          accelerator: 'Cmd+3', 
+          click: () => mainWindow.webContents.executeJavaScript("window.location.hash = '/planning'")
+        }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { label: 'Reload', accelerator: 'Cmd+R', click: () => mainWindow.reload() },
+        { label: 'Zoom In', accelerator: 'Cmd+Plus', role: 'zoomin' },
+        { label: 'Zoom Out', accelerator: 'Cmd+-', role: 'zoomout' }
+      ]
+    }
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
+app.whenReady().then(createWindow);
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
+EOF
+
+# Create package.json
+cat > package.json << 'EOF'
+{
+  "name": "budgetbot",
+  "version": "1.0.0",
+  "description": "BudgetBot - Personal budgeting app for macOS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "dependencies": {
+    "electron": "^25.0.0"
+  }
+}
+EOF
+
+# Create launch script that works from Finder
+cat > "Launch BudgetBot.command" << 'EOF'
 #!/bin/bash
-cd "$INSTALL_DIR"
-echo "🤖 Starting BudgetBot..."
-echo "Open your browser to: http://localhost:5000"
-echo "Press Ctrl+C to stop"
-echo ""
+cd "$(dirname "$0")"
 npm start
-EOL
-chmod +x "$DESKTOP_FILE"
+EOF
 
-# Create Applications folder alias
-echo "Creating Applications folder shortcut..."
-APP_ALIAS="$HOME/Applications/BudgetBot.command"
-ln -sf "$DESKTOP_FILE" "$APP_ALIAS"
+chmod +x "Launch BudgetBot.command"
 
-# Create uninstaller
-echo "Creating uninstaller..."
-cat > "$INSTALL_DIR/uninstall.sh" << EOL
-#!/bin/bash
-echo "Removing BudgetBot..."
-rm -rf "$INSTALL_DIR"
-rm -f "$HOME/Desktop/BudgetBot.command"
-rm -f "$HOME/Applications/BudgetBot.command"
-echo "BudgetBot has been removed from your system."
-EOL
-chmod +x "$INSTALL_DIR/uninstall.sh"
+# Install Electron
+echo "Installing Electron..."
+npm install
 
 echo ""
-echo "🎉 Installation Complete!"
+echo "✅ BudgetBot installation complete!"
 echo ""
-echo "BudgetBot has been installed to: $INSTALL_DIR"
+echo "📍 Installed to: $INSTALL_DIR"
 echo ""
-echo "To start BudgetBot:"
-echo "• Double-click 'BudgetBot.command' on your Desktop"
-echo "• Or run: $INSTALL_DIR/launch-budgetbot-macos.command"
+echo "🚀 To launch BudgetBot:"
+echo "   • Double-click 'Launch BudgetBot.command'"
+echo "   • Or run 'npm start' in Terminal"
 echo ""
-echo "The app will be available at: http://localhost:5000"
-echo ""
-echo "To uninstall: run $INSTALL_DIR/uninstall.sh"
-echo ""
-echo "Enjoy budgeting with BudgetBot! 🤖"
+echo "The app will connect to your live BudgetBot data."
