@@ -110,7 +110,7 @@ export function ExpenseFormFirst() {
         </CollapsibleTrigger>
         
         <CollapsibleContent>
-          <CardContent className="pt-0 space-y-4">
+          <CardContent className="pt-0">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Input
@@ -118,14 +118,14 @@ export function ExpenseFormFirst() {
                   placeholder="Description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full h-11 text-base"
+                  className="w-full"
                   spellCheck={true}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 text-base">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
                   <Input
                     type="number"
                     step="0.01"
@@ -133,12 +133,12 @@ export function ExpenseFormFirst() {
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="pl-8 h-11 text-base"
+                    className="pl-8"
                   />
                 </div>
                 
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="h-11 text-base">
+                  <SelectTrigger>
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -159,14 +159,14 @@ export function ExpenseFormFirst() {
                   placeholder="Notes (optional)"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="h-20 text-base resize-none"
+                  className="h-20 text-sm resize-none"
                   spellCheck={true}
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base"
+                className="w-full"
                 disabled={addExpenseMutation.isPending}
               >
                 {addExpenseMutation.isPending ? "Adding..." : "Add Expense"}
