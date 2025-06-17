@@ -27,7 +27,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
                   <img 
-                    src="/attached_assets/budgetbot icon_1750169109872.png" 
+                    src="/attached_assets/budgetboticon_1750169307242.png" 
                     alt="BudgetBot" 
                     className="w-full h-full object-cover"
                   />
