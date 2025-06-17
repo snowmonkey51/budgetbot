@@ -30,6 +30,9 @@ fi
 
 echo "✅ Node.js $(node -v) found"
 
+# Get the directory where the installer script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Install backend files
 echo "📦 Installing BudgetBot backend..."
 if [ -d "/Applications/BudgetBot-macOS-Final" ]; then
@@ -37,7 +40,7 @@ if [ -d "/Applications/BudgetBot-macOS-Final" ]; then
     rm -rf "/Applications/BudgetBot-macOS-Final"
 fi
 
-cp -r "./BudgetBot-macOS-Final" "/Applications/"
+cp -r "$SCRIPT_DIR/BudgetBot-macOS-Final" "/Applications/"
 cd "/Applications/BudgetBot-macOS-Final"
 
 echo "📥 Installing dependencies..."
@@ -49,7 +52,7 @@ if [ -d "/Applications/BudgetBot.app" ]; then
     rm -rf "/Applications/BudgetBot.app"
 fi
 
-cp -r "./BudgetBot.app" "/Applications/"
+cp -r "$SCRIPT_DIR/BudgetBot.app" "/Applications/"
 
 echo ""
 echo "🎉 BudgetBot installed successfully!"
