@@ -1,0 +1,32 @@
+directories:
+  output: dist-electron
+  buildResources: build
+appId: com.budgetbot.app
+productName: BudgetBot
+files:
+  - filter:
+      - electron/main.cjs
+      - electron/preload.cjs
+      - package.json
+extraMetadata:
+  main: electron/main.cjs
+mac:
+  category: public.app-category.finance
+  icon: assets/icon.icns
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+dmg:
+  title: BudgetBot Installer
+  icon: assets/icon.icns
+  background: assets/dmg-background.png
+  contents:
+    - x: 130
+      'y': 220
+    - x: 410
+      'y': 220
+      type: link
+      path: /Applications
+electronVersion: 36.4.0

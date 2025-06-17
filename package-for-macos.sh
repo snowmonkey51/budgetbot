@@ -1,152 +1,154 @@
 #!/bin/bash
+# Package BudgetBot for macOS distribution
 
-# BudgetBot macOS Distribution Packager
-# Creates a distributable package for macOS users
-
-set -e
-
-PACKAGE_NAME="BudgetBot-macOS"
-PACKAGE_DIR="./dist-macos"
-ARCHIVE_NAME="budgetbot-macos-v1.0.tar.gz"
-
-echo "📦 Creating BudgetBot macOS Distribution Package"
-echo "=============================================="
-
-# Clean previous builds
-if [ -d "$PACKAGE_DIR" ]; then
-    rm -rf "$PACKAGE_DIR"
-fi
+echo "Creating BudgetBot macOS native app package..."
 
 # Create package directory
-mkdir -p "$PACKAGE_DIR/$PACKAGE_NAME"
+mkdir -p BudgetBot-macOS-Package
+cd BudgetBot-macOS-Package
 
-# Build the application first
-echo "Building application..."
-npm run build
+# Copy essential files
+cp ../electron/main.cjs main.cjs
+cp ../electron/preload.cjs preload.cjs
 
-# Copy necessary files
-echo "Copying application files..."
-cp -r client "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp -r server "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp -r shared "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp -r dist "$PACKAGE_DIR/$PACKAGE_NAME/"
-
-# Copy configuration and documentation
-cp package.json "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp package-lock.json "$PACKAGE_DIR/$PACKAGE_NAME/" 2>/dev/null || true
-cp drizzle.config.ts "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp postcss.config.js "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp tailwind.config.ts "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp vite.config.ts "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp tsconfig.json "$PACKAGE_DIR/$PACKAGE_NAME/" 2>/dev/null || true
-
-# Copy macOS-specific files
-cp README-macOS.md "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp setup-macos.sh "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp launch-budgetbot-macos.command "$PACKAGE_DIR/$PACKAGE_NAME/"
-cp install-budgetbot-macos.sh "$PACKAGE_DIR/$PACKAGE_NAME/"
-
-# Create a simplified package.json for distribution
-cat > "$PACKAGE_DIR/$PACKAGE_NAME/package-simple.json" << 'EOL'
+# Create a standalone package.json for the app
+cat > package.json << 'EOF'
 {
   "name": "budgetbot-macos",
   "version": "1.0.0",
-  "type": "module",
-  "license": "MIT",
   "description": "BudgetBot - Personal budgeting application for macOS",
-  "scripts": {
-    "start": "NODE_ENV=production node dist/index.js",
-    "dev": "NODE_ENV=development tsx server/index.ts",
-    "setup": "./setup-macos.sh",
-    "launch": "./launch-budgetbot-macos.command"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+  "main": "main.cjs",
+  "author": "BudgetBot Team",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^36.4.0"
   }
 }
-EOL
+EOF
 
-# Create installation instructions
-cat > "$PACKAGE_DIR/$PACKAGE_NAME/INSTALL.md" << 'EOL'
-# BudgetBot macOS Installation
+# Create installation script
+cat > install.sh << 'EOF'
+#!/bin/bash
+echo "Installing BudgetBot for macOS..."
 
-## Quick Start
+# Install dependencies
+npm install
 
-1. **Extract this package** to your desired location (e.g., Applications folder)
-2. **Run the setup script**:
-   ```bash
-   ./setup-macos.sh
-   ```
-3. **Launch BudgetBot**:
-   ```bash
-   ./launch-budgetbot-macos.command
-   ```
+echo "✅ Installation complete!"
+echo ""
+echo "To run BudgetBot:"
+echo "  npm start"
+echo ""
+echo "To create a proper macOS app bundle:"
+echo "  npm run build"
+EOF
 
-## What You Need
+# Create run script
+cat > run.sh << 'EOF'
+#!/bin/bash
+npx electron main.cjs
+EOF
+
+# Add package.json scripts
+cat > package.json << 'EOF'
+{
+  "name": "budgetbot-macos",
+  "version": "1.0.0",
+  "description": "BudgetBot - Personal budgeting application for macOS",
+  "main": "main.cjs",
+  "author": "BudgetBot Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron main.cjs",
+    "build": "electron-builder",
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "electron": "^36.4.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.budgetbot.app",
+    "productName": "BudgetBot",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.finance",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ]
+    }
+  }
+}
+EOF
+
+# Create README
+cat > README.md << 'EOF'
+# BudgetBot for macOS
+
+A native macOS desktop application for personal budgeting and expense tracking.
+
+## Installation
+
+1. Install Node.js from https://nodejs.org (if not already installed)
+2. Open Terminal and navigate to this folder
+3. Run: `npm install`
+
+## Running the App
+
+```bash
+npm start
+```
+
+## Building a Native App
+
+To create a proper macOS .app bundle and DMG installer:
+
+```bash
+npm run build
+```
+
+This will create:
+- `dist/BudgetBot.app` - The application bundle
+- `dist/BudgetBot-1.0.0.dmg` - DMG installer
+
+## Features
+
+- Native macOS window and menu integration
+- Keyboard shortcuts (Cmd+1/2/3 for budget periods)
+- Full BudgetBot functionality in a desktop app
+- Fast performance with local caching
+
+## Requirements
 
 - macOS 10.15 or later
-- Node.js 18 or later (download from https://nodejs.org/)
+- Node.js 18 or later
+EOF
 
-## Files Included
+# Make scripts executable
+chmod +x install.sh run.sh
 
-- `README-macOS.md` - Detailed documentation
-- `setup-macos.sh` - Automated setup script
-- `launch-budgetbot-macos.command` - Application launcher
-- `install-budgetbot-macos.sh` - System-wide installer
-
-## Getting Help
-
-See `README-macOS.md` for troubleshooting and detailed instructions.
-EOL
-
-# Create a startup script that works without build dependencies
-cat > "$PACKAGE_DIR/$PACKAGE_NAME/start-budgetbot.sh" << 'EOL'
-#!/bin/bash
-
-# Simple BudgetBot starter for macOS
-cd "$(dirname "$0")"
-
-# Check if built files exist
-if [ ! -d "dist" ]; then
-    echo "❌ Application not built. Please run ./setup-macos.sh first"
-    exit 1
-fi
-
-# Check if dependencies are installed
-if [ ! -d "node_modules" ]; then
-    echo "Installing dependencies..."
-    npm install --production
-fi
-
-echo "🤖 Starting BudgetBot..."
-echo "Open your browser to: http://localhost:5000"
-echo "Press Ctrl+C to stop"
-echo ""
-
-NODE_ENV=production node dist/index.js
-EOL
-
-chmod +x "$PACKAGE_DIR/$PACKAGE_NAME/start-budgetbot.sh"
-
-# Create archive
-echo "Creating distribution archive..."
-cd "$PACKAGE_DIR"
-tar -czf "../$ARCHIVE_NAME" "$PACKAGE_NAME"
 cd ..
 
-# Cleanup
-rm -rf "$PACKAGE_DIR"
+# Create tar archive
+tar -czf BudgetBot-macOS-Complete.tar.gz BudgetBot-macOS-Package/
 
+echo "✅ Package created: BudgetBot-macOS-Complete.tar.gz"
 echo ""
-echo "✅ Distribution package created: $ARCHIVE_NAME"
+echo "📦 Contents:"
+echo "  • Native Electron app files"
+echo "  • Installation scripts"
+echo "  • Build configuration"
+echo "  • Complete documentation"
 echo ""
-echo "📋 Package Contents:"
-echo "   - Complete BudgetBot application"
-echo "   - macOS setup scripts"
-echo "   - Installation documentation"
-echo "   - Launcher scripts"
-echo ""
-echo "📤 To distribute:"
-echo "   1. Share the $ARCHIVE_NAME file"
-echo "   2. Recipients extract and run ./setup-macos.sh"
-echo "   3. Launch with ./launch-budgetbot-macos.command"
+echo "🚀 To use:"
+echo "  1. Extract the tar.gz file"
+echo "  2. cd BudgetBot-macOS-Package"
+echo "  3. Run: npm install"
+echo "  4. Run: npm start"
