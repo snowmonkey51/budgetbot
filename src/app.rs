@@ -1,8 +1,42 @@
-use eframe::egui::{self, Color32, FontId, Margin, Rounding, Stroke, TextureHandle, Vec2};
+use std::path::PathBuf;
+use eframe::egui::{self, Color32, FontFamily, FontId, Margin, Rounding, Stroke, TextureHandle, Vec2};
 
 use crate::models::Budget;
 use crate::storage::{load_budget, save_budget};
 use crate::ui::{render_balance_bar, render_dashboard, render_expenses, render_expenses_header, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm, TemplateAction, TemplateManager};
+
+/// Get the path to a resource file, checking both development and bundle paths
+fn get_resource_path(relative_path: &str) -> Option<PathBuf> {
+    // Try development paths first
+    let dev_paths = [
+        PathBuf::from(format!("assets/{}", relative_path)),
+        PathBuf::from(format!("../assets/{}", relative_path)),
+        PathBuf::from(format!("./assets/{}", relative_path)),
+        PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/")).join(relative_path),
+    ];
+
+    for path in &dev_paths {
+        if path.exists() {
+            return Some(path.clone());
+        }
+    }
+
+    // Try macOS app bundle path (Contents/Resources/assets/...)
+    if let Ok(exe_path) = std::env::current_exe() {
+        // exe is at Budgetbot.app/Contents/MacOS/budgetbot
+        // resources are at Budgetbot.app/Contents/Resources/assets/
+        if let Some(macos_dir) = exe_path.parent() {
+            if let Some(contents_dir) = macos_dir.parent() {
+                let bundle_path = contents_dir.join("Resources").join("assets").join(relative_path);
+                if bundle_path.exists() {
+                    return Some(bundle_path);
+                }
+            }
+        }
+    }
+
+    None
+}
 
 pub struct BudgetApp {
     budget: Budget,
@@ -39,17 +73,8 @@ impl BudgetApp {
 }
 
 fn load_logo(ctx: &egui::Context) -> Option<TextureHandle> {
-    // Try to load from various possible locations
-    let logo_paths = [
-        "assets/logo.png",
-        "../assets/logo.png",
-        "./assets/logo.png",
-        // Development path
-        concat!(env!("CARGO_MANIFEST_DIR"), "/assets/logo.png"),
-    ];
-
-    for path in logo_paths {
-        if let Ok(image_data) = std::fs::read(path) {
+    if let Some(path) = get_resource_path("applogo.png") {
+        if let Ok(image_data) = std::fs::read(&path) {
             if let Ok(image) = image::load_from_memory(&image_data) {
                 let rgba = image.to_rgba8();
                 let size = [rgba.width() as usize, rgba.height() as usize];
@@ -59,11 +84,29 @@ fn load_logo(ctx: &egui::Context) -> Option<TextureHandle> {
             }
         }
     }
-
     None
 }
 
+// Embed the Beyonders font directly into the binary
+const BEYONDERS_FONT: &[u8] = include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/beyonders/Beyonders.ttf"));
+
 fn configure_styles(ctx: &egui::Context) {
+    // Load custom Beyonders font (embedded in binary)
+    let mut fonts = egui::FontDefinitions::default();
+
+    fonts.font_data.insert(
+        "Beyonders".to_owned(),
+        egui::FontData::from_static(BEYONDERS_FONT).into(),
+    );
+
+    // Add Beyonders as a custom font family
+    fonts.families.insert(
+        FontFamily::Name("Beyonders".into()),
+        vec!["Beyonders".to_owned()],
+    );
+
+    ctx.set_fonts(fonts);
+
     let mut style = (*ctx.style()).clone();
 
     // Modern rounded corners - more pronounced
@@ -212,13 +255,13 @@ impl eframe::App for BudgetApp {
                 ui.horizontal(|ui| {
                     // Display logo image if loaded, otherwise fallback to text
                     if let Some(texture) = &self.logo_texture {
-                        let logo_size = Vec2::new(40.0, 40.0);
+                        let logo_size = Vec2::new(60.0, 60.0);
                         ui.image((texture.id(), logo_size));
                         ui.add_space(8.0);
                     }
                     ui.label(egui::RichText::new("Budgetbot")
-                        .font(FontId::proportional(32.0))
-                        .color(Color32::from_rgb(17, 24, 39))
+                        .font(FontId::new(32.0, FontFamily::Name("Beyonders".into())))
+                        .color(Color32::from_rgb(192, 192, 192))  // Silver color
                         .strong());
 
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {

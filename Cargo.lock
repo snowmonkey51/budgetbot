@@ -477,8 +477,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "budget_app"
-version = "0.1.0"
+name = "budgetbot"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "directories",

@@ -1,7 +1,9 @@
 [package]
-name = "budget_app"
-version = "0.1.0"
+name = "budgetbot"
+version = "1.0.0"
 edition = "2024"
+description = "A modern desktop budgeting application"
+authors = ["Aaron Bevill"]
 
 [dependencies]
 eframe = { version = "0.29", features = ["default"] }
@@ -13,3 +15,18 @@ serde_json = "1.0"
 uuid = { version = "1.0", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 directories = "5.0"
+
+[package.metadata.bundle]
+name = "Budgetbot"
+identifier = "com.budgetbot.app"
+icon = ["assets/logo2.icns"]
+version = "1.0.0"
+copyright = "Copyright © 2025 Aaron Bevill. All rights reserved."
+category = "Finance"
+short_description = "A modern desktop budgeting application"
+long_description = """
+Budgetbot is a simple and elegant desktop budgeting application that helps you
+track your income and expenses. Features include expense categories, templates,
+a built-in calculator, and beautiful visualizations of your budget.
+"""
+resources = ["assets/logo2.png", "assets/applogo.png", "assets/beyonders/Beyonders.ttf"]
