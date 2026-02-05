@@ -8,10 +8,8 @@ pub enum HistoryAction {
     ToggleExpense(Uuid),
 }
 
-pub fn render_expenses(ui: &mut Ui, budget: &mut Budget) -> Option<HistoryAction> {
-    let mut action = None;
-
-    // Modern header
+/// Render the expenses header (title and count) - call this outside the scroll area
+pub fn render_expenses_header(ui: &mut Ui, expense_count: usize) {
     ui.horizontal(|ui| {
         ui.label(
             RichText::new("Expenses")
@@ -22,7 +20,7 @@ pub fn render_expenses(ui: &mut Ui, budget: &mut Budget) -> Option<HistoryAction
 
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             ui.label(
-                RichText::new(format!("{} items", budget.expenses.len()))
+                RichText::new(format!("{} items", expense_count))
                     .size(12.0)
                     .color(Color32::from_rgb(156, 163, 175)),
             );
@@ -30,6 +28,10 @@ pub fn render_expenses(ui: &mut Ui, budget: &mut Budget) -> Option<HistoryAction
     });
 
     ui.add_space(16.0);
+}
+
+pub fn render_expenses(ui: &mut Ui, budget: &mut Budget) -> Option<HistoryAction> {
+    let mut action = None;
 
     if budget.expenses.is_empty() {
         // Modern empty state

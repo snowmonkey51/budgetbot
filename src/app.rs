@@ -1,8 +1,8 @@
-use eframe::egui::{self, Color32, FontId, Margin, Rounding, Stroke, Vec2};
+use eframe::egui::{self, Color32, FontId, Margin, Rounding, Stroke, TextureHandle, Vec2};
 
 use crate::models::Budget;
 use crate::storage::{load_budget, save_budget};
-use crate::ui::{render_balance_bar, render_dashboard, render_expenses, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm, TemplateAction, TemplateManager};
+use crate::ui::{render_balance_bar, render_dashboard, render_expenses, render_expenses_header, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm, TemplateAction, TemplateManager};
 
 pub struct BudgetApp {
     budget: Budget,
@@ -11,12 +11,17 @@ pub struct BudgetApp {
     category_manager: CategoryManager,
     calculator: Calculator,
     template_manager: TemplateManager,
+    logo_texture: Option<TextureHandle>,
 }
 
 impl BudgetApp {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         configure_styles(&cc.egui_ctx);
         let budget = load_budget();
+
+        // Load the logo image
+        let logo_texture = load_logo(&cc.egui_ctx);
+
         Self {
             budget,
             expense_form: ExpenseForm::new(),
@@ -24,12 +29,38 @@ impl BudgetApp {
             category_manager: CategoryManager::new(),
             calculator: Calculator::new(),
             template_manager: TemplateManager::new(),
+            logo_texture,
         }
     }
 
     fn save(&mut self) {
         let _ = save_budget(&self.budget);
     }
+}
+
+fn load_logo(ctx: &egui::Context) -> Option<TextureHandle> {
+    // Try to load from various possible locations
+    let logo_paths = [
+        "assets/logo.png",
+        "../assets/logo.png",
+        "./assets/logo.png",
+        // Development path
+        concat!(env!("CARGO_MANIFEST_DIR"), "/assets/logo.png"),
+    ];
+
+    for path in logo_paths {
+        if let Ok(image_data) = std::fs::read(path) {
+            if let Ok(image) = image::load_from_memory(&image_data) {
+                let rgba = image.to_rgba8();
+                let size = [rgba.width() as usize, rgba.height() as usize];
+                let pixels = rgba.into_raw();
+                let color_image = egui::ColorImage::from_rgba_unmultiplied(size, &pixels);
+                return Some(ctx.load_texture("logo", color_image, egui::TextureOptions::LINEAR));
+            }
+        }
+    }
+
+    None
 }
 
 fn configure_styles(ctx: &egui::Context) {
@@ -177,9 +208,15 @@ impl eframe::App for BudgetApp {
             .show(ctx, |ui| {
                 ui.style_mut().spacing.item_spacing = Vec2::new(12.0, 14.0);
 
-                // Modern header with gradient-style text
+                // Modern header with logo
                 ui.horizontal(|ui| {
-                    ui.label(egui::RichText::new("[°_°] Budgetbot")
+                    // Display logo image if loaded, otherwise fallback to text
+                    if let Some(texture) = &self.logo_texture {
+                        let logo_size = Vec2::new(40.0, 40.0);
+                        ui.image((texture.id(), logo_size));
+                        ui.add_space(8.0);
+                    }
+                    ui.label(egui::RichText::new("Budgetbot")
                         .font(FontId::proportional(32.0))
                         .color(Color32::from_rgb(17, 24, 39))
                         .strong());
@@ -188,11 +225,10 @@ impl eframe::App for BudgetApp {
                         let manage_btn = egui::Button::new(
                             egui::RichText::new("⚙ Categories")
                                 .size(13.0)
-                                .color(Color32::WHITE)
-                                .strong(),
+                                .color(Color32::from_rgb(99, 102, 241)),
                         )
-                        .fill(Color32::from_rgb(99, 102, 241))
-                        .stroke(Stroke::NONE)
+                        .fill(Color32::from_rgb(238, 242, 255))
+                        .stroke(Stroke::new(1.0, Color32::from_rgb(199, 210, 254)))
                         .rounding(Rounding::same(12.0))
                         .min_size(Vec2::new(110.0, 36.0));
 
@@ -205,11 +241,10 @@ impl eframe::App for BudgetApp {
                         let calc_btn = egui::Button::new(
                             egui::RichText::new("Calculator")
                                 .size(13.0)
-                                .color(Color32::WHITE)
-                                .strong(),
+                                .color(Color32::from_rgb(99, 102, 241)),
                         )
-                        .fill(Color32::from_rgb(16, 185, 129))
-                        .stroke(Stroke::NONE)
+                        .fill(Color32::from_rgb(238, 242, 255))
+                        .stroke(Stroke::new(1.0, Color32::from_rgb(199, 210, 254)))
                         .rounding(Rounding::same(12.0))
                         .min_size(Vec2::new(100.0, 36.0));
 
@@ -254,16 +289,16 @@ impl eframe::App for BudgetApp {
 
                         ui.add_space(20.0);
 
-                        // Modern gradient-style Add Expense button - centered
+                        // Add Expense button - matching Edit button style
                         ui.vertical_centered(|ui| {
                             let expense_btn = egui::Button::new(
                                 egui::RichText::new("+ Add Expense")
-                                    .color(Color32::WHITE)
+                                    .color(Color32::from_rgb(99, 102, 241))
                                     .size(15.0)
                                     .strong()
                             )
-                            .fill(Color32::from_rgb(239, 68, 68))
-                            .stroke(Stroke::NONE)
+                            .fill(Color32::from_rgb(238, 242, 255))
+                            .stroke(Stroke::new(1.0, Color32::from_rgb(199, 210, 254)))
                             .rounding(Rounding::same(14.0))
                             .min_size(Vec2::new(left_column_width - 8.0, 50.0));
 
@@ -274,16 +309,16 @@ impl eframe::App for BudgetApp {
 
                         ui.add_space(12.0);
 
-                        // Templates button - same style as Add Expense
+                        // Templates button - matching Edit button style
                         ui.vertical_centered(|ui| {
                             let template_btn = egui::Button::new(
                                 egui::RichText::new("Templates")
-                                    .color(Color32::WHITE)
+                                    .color(Color32::from_rgb(99, 102, 241))
                                     .size(15.0)
                                     .strong()
                             )
-                            .fill(Color32::from_rgb(99, 102, 241))
-                            .stroke(Stroke::NONE)
+                            .fill(Color32::from_rgb(238, 242, 255))
+                            .stroke(Stroke::new(1.0, Color32::from_rgb(199, 210, 254)))
                             .rounding(Rounding::same(14.0))
                             .min_size(Vec2::new(left_column_width - 8.0, 50.0));
 
@@ -312,7 +347,10 @@ impl eframe::App for BudgetApp {
                                 offset: [0.0, 4.0].into(),
                             })
                             .show(ui, |ui| {
-                                let scroll_height = available_height - 140.0; // Account for total line
+                                // Header - always visible outside scroll area
+                                render_expenses_header(ui, self.budget.expenses.len());
+
+                                let scroll_height = available_height - 180.0; // Account for header and total line
 
                                 egui::ScrollArea::vertical()
                                     .max_height(scroll_height.max(150.0))
