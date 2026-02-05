@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use super::expense::Expense;
+use super::template::Template;
 
 /// RGB color stored as [r, g, b]
 pub type CategoryColor = [u8; 3];
@@ -38,6 +39,8 @@ pub struct Budget {
     pub categories: Vec<String>,
     #[serde(default = "default_category_colors")]
     pub category_colors: HashMap<String, CategoryColor>,
+    #[serde(default)]
+    pub templates: Vec<Template>,
 }
 
 impl Default for Budget {
@@ -47,6 +50,7 @@ impl Default for Budget {
             expenses: Vec::new(),
             categories: default_categories(),
             category_colors: default_category_colors(),
+            templates: Vec::new(),
         }
     }
 }
@@ -109,6 +113,37 @@ impl Budget {
     pub fn set_category_color(&mut self, category: &str, color: CategoryColor) {
         if self.categories.contains(&category.to_string()) {
             self.category_colors.insert(category.to_string(), color);
+        }
+    }
+
+    // Template management
+    pub fn save_template(&mut self, name: String) {
+        let template = Template::new(name, self.expenses.clone());
+        self.templates.push(template);
+    }
+
+    pub fn load_template(&mut self, id: Uuid) {
+        if let Some(template) = self.templates.iter().find(|t| t.id == id) {
+            // Clone expenses from template, giving them new IDs
+            self.expenses = template.expenses.iter().map(|e| {
+                Expense::new(e.amount, e.category.clone(), e.description.clone(), e.date)
+            }).collect();
+        }
+    }
+
+    pub fn delete_template(&mut self, id: Uuid) {
+        self.templates.retain(|t| t.id != id);
+    }
+
+    pub fn rename_template(&mut self, id: Uuid, new_name: String) {
+        if let Some(template) = self.templates.iter_mut().find(|t| t.id == id) {
+            template.name = new_name;
+        }
+    }
+
+    pub fn update_template_expenses(&mut self, id: Uuid, expenses: Vec<Expense>) {
+        if let Some(template) = self.templates.iter_mut().find(|t| t.id == id) {
+            template.expenses = expenses;
         }
     }
 }

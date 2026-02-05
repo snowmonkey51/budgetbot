@@ -2,7 +2,7 @@ use eframe::egui::{self, Color32, FontId, Margin, Rounding, Stroke, Vec2};
 
 use crate::models::Budget;
 use crate::storage::{load_budget, save_budget};
-use crate::ui::{render_balance_bar, render_dashboard, render_expenses, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm};
+use crate::ui::{render_balance_bar, render_dashboard, render_expenses, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm, TemplateAction, TemplateManager};
 
 pub struct BudgetApp {
     budget: Budget,
@@ -10,6 +10,7 @@ pub struct BudgetApp {
     income_form: IncomeForm,
     category_manager: CategoryManager,
     calculator: Calculator,
+    template_manager: TemplateManager,
 }
 
 impl BudgetApp {
@@ -22,6 +23,7 @@ impl BudgetApp {
             income_form: IncomeForm::new(),
             category_manager: CategoryManager::new(),
             calculator: Calculator::new(),
+            template_manager: TemplateManager::new(),
         }
     }
 
@@ -117,6 +119,40 @@ impl eframe::App for BudgetApp {
 
         // Render calculator popup window
         self.calculator.render(ctx);
+
+        // Render template manager popup window
+        let template_actions = self.template_manager.render(
+            ctx,
+            &self.budget.templates,
+            self.budget.expenses.len(),
+            &self.budget.categories,
+            &self.budget.category_colors,
+        );
+        for action in template_actions {
+            match action {
+                TemplateAction::Save(name) => {
+                    self.budget.save_template(name);
+                    self.save();
+                }
+                TemplateAction::Load(id) => {
+                    self.budget.load_template(id);
+                    self.save();
+                    self.template_manager.close();
+                }
+                TemplateAction::Delete(id) => {
+                    self.budget.delete_template(id);
+                    self.save();
+                }
+                TemplateAction::Rename(id, new_name) => {
+                    self.budget.rename_template(id, new_name);
+                    self.save();
+                }
+                TemplateAction::UpdateExpenses(id, expenses) => {
+                    self.budget.update_template_expenses(id, expenses);
+                    self.save();
+                }
+            }
+        }
 
         // Bottom panel for balance bar - modern glassmorphism style
         egui::TopBottomPanel::bottom("balance_bar")
@@ -233,6 +269,26 @@ impl eframe::App for BudgetApp {
 
                             if ui.add(expense_btn).clicked() {
                                 self.expense_form.open();
+                            }
+                        });
+
+                        ui.add_space(12.0);
+
+                        // Templates button - same style as Add Expense
+                        ui.vertical_centered(|ui| {
+                            let template_btn = egui::Button::new(
+                                egui::RichText::new("Templates")
+                                    .color(Color32::WHITE)
+                                    .size(15.0)
+                                    .strong()
+                            )
+                            .fill(Color32::from_rgb(99, 102, 241))
+                            .stroke(Stroke::NONE)
+                            .rounding(Rounding::same(14.0))
+                            .min_size(Vec2::new(left_column_width - 8.0, 50.0));
+
+                            if ui.add(template_btn).clicked() {
+                                self.template_manager.open();
                             }
                         });
                     });
