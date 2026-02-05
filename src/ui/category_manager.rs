@@ -31,6 +31,7 @@ pub struct CategoryManager {
     pub is_open: bool,
     new_category_input: String,
     new_category_color: CategoryColor,
+    color_picker_open_for: Option<String>, // None = new category, Some(name) = existing category
 }
 
 impl Default for CategoryManager {
@@ -45,6 +46,7 @@ impl CategoryManager {
             is_open: false,
             new_category_input: String::new(),
             new_category_color: [59, 130, 246], // Default blue
+            color_picker_open_for: None,
         }
     }
 
@@ -52,11 +54,13 @@ impl CategoryManager {
         self.is_open = true;
         self.new_category_input.clear();
         self.new_category_color = [59, 130, 246];
+        self.color_picker_open_for = None;
     }
 
     pub fn close(&mut self) {
         self.is_open = false;
         self.new_category_input.clear();
+        self.color_picker_open_for = None;
     }
 
     pub fn render(
@@ -122,7 +126,7 @@ impl CategoryManager {
                     ui.add_space(4.0);
 
                     ui.horizontal(|ui| {
-                        // Color swatch
+                        // Color swatch with dropdown
                         let color = Color32::from_rgb(
                             self.new_category_color[0],
                             self.new_category_color[1],
@@ -133,11 +137,13 @@ impl CategoryManager {
                         ui.painter().rect_stroke(rect, Rounding::same(6.0), Stroke::new(1.0, Color32::from_rgb(200, 200, 210)));
 
                         if response.clicked() {
-                            // Cycle through preset colors
-                            let current_idx = COLOR_PRESETS.iter().position(|c| *c == self.new_category_color).unwrap_or(0);
-                            self.new_category_color = COLOR_PRESETS[(current_idx + 1) % COLOR_PRESETS.len()];
+                            self.color_picker_open_for = if self.color_picker_open_for == Some("__new__".to_string()) {
+                                None
+                            } else {
+                                Some("__new__".to_string())
+                            };
                         }
-                        response.on_hover_text("Click to change color");
+                        response.on_hover_text("Click to choose color");
 
                         let text_response = ui.add(
                             TextEdit::singleline(&mut self.new_category_input)
@@ -162,8 +168,39 @@ impl CategoryManager {
                             ));
                             self.new_category_input.clear();
                             self.new_category_color = [59, 130, 246];
+                            self.color_picker_open_for = None;
                         }
                     });
+
+                    // Color picker for new category
+                    if self.color_picker_open_for == Some("__new__".to_string()) {
+                        ui.add_space(8.0);
+                        egui::Frame::none()
+                            .fill(Color32::from_rgb(250, 250, 252))
+                            .rounding(Rounding::same(8.0))
+                            .stroke(Stroke::new(1.0, Color32::from_rgb(220, 220, 230)))
+                            .inner_margin(Margin::same(10.0))
+                            .show(ui, |ui| {
+                                ui.horizontal_wrapped(|ui| {
+                                    ui.spacing_mut().item_spacing = Vec2::new(6.0, 6.0);
+                                    for preset in COLOR_PRESETS {
+                                        let preset_color = Color32::from_rgb(preset[0], preset[1], preset[2]);
+                                        let is_selected = *preset == self.new_category_color;
+                                        let (rect, response) = ui.allocate_exact_size(Vec2::splat(28.0), egui::Sense::click());
+                                        ui.painter().rect_filled(rect, Rounding::same(6.0), preset_color);
+                                        if is_selected {
+                                            ui.painter().rect_stroke(rect, Rounding::same(6.0), Stroke::new(2.5, Color32::from_rgb(30, 30, 40)));
+                                        } else {
+                                            ui.painter().rect_stroke(rect, Rounding::same(6.0), Stroke::new(1.0, preset_color.gamma_multiply(0.7)));
+                                        }
+                                        if response.clicked() {
+                                            self.new_category_color = *preset;
+                                            self.color_picker_open_for = None;
+                                        }
+                                    }
+                                });
+                            });
+                    }
 
                     ui.add_space(20.0);
 
@@ -193,6 +230,7 @@ impl CategoryManager {
                                         .copied()
                                         .unwrap_or([156, 163, 175]);
                                     let bg_color = Color32::from_rgb(cat_color[0], cat_color[1], cat_color[2]);
+                                    let is_picker_open = self.color_picker_open_for == Some(category.clone());
 
                                     egui::Frame::none()
                                         .fill(bg_color.gamma_multiply(0.15))
@@ -200,45 +238,78 @@ impl CategoryManager {
                                         .stroke(Stroke::new(1.0, bg_color.gamma_multiply(0.3)))
                                         .inner_margin(Margin::symmetric(12.0, 10.0))
                                         .show(ui, |ui| {
-                                            ui.horizontal(|ui| {
-                                                // Color picker button
-                                                let (rect, response) = ui.allocate_exact_size(Vec2::splat(24.0), egui::Sense::click());
-                                                ui.painter().rect_filled(rect, Rounding::same(4.0), bg_color);
-                                                ui.painter().rect_stroke(rect, Rounding::same(4.0), Stroke::new(1.0, bg_color.gamma_multiply(0.7)));
+                                            ui.vertical(|ui| {
+                                                ui.horizontal(|ui| {
+                                                    // Color picker button
+                                                    let (rect, response) = ui.allocate_exact_size(Vec2::splat(24.0), egui::Sense::click());
+                                                    ui.painter().rect_filled(rect, Rounding::same(4.0), bg_color);
+                                                    ui.painter().rect_stroke(rect, Rounding::same(4.0), Stroke::new(1.0, bg_color.gamma_multiply(0.7)));
 
-                                                if response.clicked() {
-                                                    // Cycle through preset colors
-                                                    let current_idx = COLOR_PRESETS.iter().position(|c| *c == cat_color).unwrap_or(0);
-                                                    let new_color = COLOR_PRESETS[(current_idx + 1) % COLOR_PRESETS.len()];
-                                                    actions.push(CategoryAction::UpdateColor(category.clone(), new_color));
+                                                    if response.clicked() {
+                                                        self.color_picker_open_for = if is_picker_open {
+                                                            None
+                                                        } else {
+                                                            Some(category.clone())
+                                                        };
+                                                    }
+                                                    response.on_hover_text("Click to choose color");
+
+                                                    ui.add_space(8.0);
+
+                                                    ui.label(
+                                                        RichText::new(category)
+                                                            .size(13.0)
+                                                            .color(Color32::from_rgb(50, 50, 60)),
+                                                    );
+
+                                                    ui.with_layout(
+                                                        egui::Layout::right_to_left(egui::Align::Center),
+                                                        |ui| {
+                                                            let del_btn = egui::Button::new(
+                                                                RichText::new("Delete")
+                                                                    .size(11.0)
+                                                                    .color(Color32::from_rgb(220, 38, 38)),
+                                                            )
+                                                            .fill(Color32::from_rgb(254, 242, 242))
+                                                            .stroke(Stroke::new(1.0, Color32::from_rgb(254, 202, 202)))
+                                                            .rounding(Rounding::same(4.0));
+
+                                                            if ui.add(del_btn).clicked() {
+                                                                actions.push(CategoryAction::Delete(category.clone()));
+                                                            }
+                                                        },
+                                                    );
+                                                });
+
+                                                // Color picker dropdown for this category
+                                                if is_picker_open {
+                                                    ui.add_space(8.0);
+                                                    egui::Frame::none()
+                                                        .fill(Color32::from_rgb(255, 255, 255))
+                                                        .rounding(Rounding::same(6.0))
+                                                        .stroke(Stroke::new(1.0, Color32::from_rgb(220, 220, 230)))
+                                                        .inner_margin(Margin::same(8.0))
+                                                        .show(ui, |ui| {
+                                                            ui.horizontal_wrapped(|ui| {
+                                                                ui.spacing_mut().item_spacing = Vec2::new(5.0, 5.0);
+                                                                for preset in COLOR_PRESETS {
+                                                                    let preset_color = Color32::from_rgb(preset[0], preset[1], preset[2]);
+                                                                    let is_selected = *preset == cat_color;
+                                                                    let (rect, response) = ui.allocate_exact_size(Vec2::splat(24.0), egui::Sense::click());
+                                                                    ui.painter().rect_filled(rect, Rounding::same(4.0), preset_color);
+                                                                    if is_selected {
+                                                                        ui.painter().rect_stroke(rect, Rounding::same(4.0), Stroke::new(2.5, Color32::from_rgb(30, 30, 40)));
+                                                                    } else {
+                                                                        ui.painter().rect_stroke(rect, Rounding::same(4.0), Stroke::new(1.0, preset_color.gamma_multiply(0.7)));
+                                                                    }
+                                                                    if response.clicked() {
+                                                                        actions.push(CategoryAction::UpdateColor(category.clone(), *preset));
+                                                                        self.color_picker_open_for = None;
+                                                                    }
+                                                                }
+                                                            });
+                                                        });
                                                 }
-                                                response.on_hover_text("Click to change color");
-
-                                                ui.add_space(8.0);
-
-                                                ui.label(
-                                                    RichText::new(category)
-                                                        .size(13.0)
-                                                        .color(Color32::from_rgb(50, 50, 60)),
-                                                );
-
-                                                ui.with_layout(
-                                                    egui::Layout::right_to_left(egui::Align::Center),
-                                                    |ui| {
-                                                        let del_btn = egui::Button::new(
-                                                            RichText::new("Delete")
-                                                                .size(11.0)
-                                                                .color(Color32::from_rgb(220, 38, 38)),
-                                                        )
-                                                        .fill(Color32::from_rgb(254, 242, 242))
-                                                        .stroke(Stroke::new(1.0, Color32::from_rgb(254, 202, 202)))
-                                                        .rounding(Rounding::same(4.0));
-
-                                                        if ui.add(del_btn).clicked() {
-                                                            actions.push(CategoryAction::Delete(category.clone()));
-                                                        }
-                                                    },
-                                                );
                                             });
                                         });
                                 }

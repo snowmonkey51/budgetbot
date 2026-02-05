@@ -1,9 +1,11 @@
+pub mod calculator;
 pub mod category_manager;
 pub mod dashboard;
 pub mod expense_form;
 pub mod history;
 pub mod income_form;
 
+pub use calculator::Calculator;
 pub use category_manager::{CategoryAction, CategoryManager};
 pub use dashboard::render_dashboard;
 pub use expense_form::ExpenseForm;

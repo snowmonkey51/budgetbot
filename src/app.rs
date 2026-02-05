@@ -2,13 +2,14 @@ use eframe::egui::{self, Color32, FontId, Margin, Rounding, Stroke, Vec2};
 
 use crate::models::Budget;
 use crate::storage::{load_budget, save_budget};
-use crate::ui::{render_balance_bar, render_dashboard, render_expenses, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm};
+use crate::ui::{render_balance_bar, render_dashboard, render_expenses, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm};
 
 pub struct BudgetApp {
     budget: Budget,
     expense_form: ExpenseForm,
     income_form: IncomeForm,
     category_manager: CategoryManager,
+    calculator: Calculator,
 }
 
 impl BudgetApp {
@@ -20,6 +21,7 @@ impl BudgetApp {
             expense_form: ExpenseForm::new(),
             income_form: IncomeForm::new(),
             category_manager: CategoryManager::new(),
+            calculator: Calculator::new(),
         }
     }
 
@@ -113,6 +115,9 @@ impl eframe::App for BudgetApp {
             self.save();
         }
 
+        // Render calculator popup window
+        self.calculator.render(ctx);
+
         // Bottom panel for balance bar - modern glassmorphism style
         egui::TopBottomPanel::bottom("balance_bar")
             .frame(egui::Frame::none()
@@ -147,14 +152,33 @@ impl eframe::App for BudgetApp {
                         let manage_btn = egui::Button::new(
                             egui::RichText::new("⚙ Categories")
                                 .size(13.0)
-                                .color(Color32::from_rgb(99, 102, 241)),
+                                .color(Color32::WHITE)
+                                .strong(),
                         )
-                        .fill(Color32::from_rgb(238, 242, 255))
-                        .stroke(Stroke::new(1.0, Color32::from_rgb(199, 210, 254)))
-                        .rounding(Rounding::same(10.0));
+                        .fill(Color32::from_rgb(99, 102, 241))
+                        .stroke(Stroke::NONE)
+                        .rounding(Rounding::same(12.0))
+                        .min_size(Vec2::new(110.0, 36.0));
 
                         if ui.add(manage_btn).clicked() {
                             self.category_manager.open();
+                        }
+
+                        ui.add_space(8.0);
+
+                        let calc_btn = egui::Button::new(
+                            egui::RichText::new("Calculator")
+                                .size(13.0)
+                                .color(Color32::WHITE)
+                                .strong(),
+                        )
+                        .fill(Color32::from_rgb(16, 185, 129))
+                        .stroke(Stroke::NONE)
+                        .rounding(Rounding::same(12.0))
+                        .min_size(Vec2::new(100.0, 36.0));
+
+                        if ui.add(calc_btn).clicked() {
+                            self.calculator.open();
                         }
                     });
                 });
@@ -238,10 +262,14 @@ impl eframe::App for BudgetApp {
                                     .max_height(scroll_height.max(150.0))
                                     .auto_shrink([false, false])
                                     .show(ui, |ui| {
-                                        if let Some(action) = render_expenses(ui, &self.budget) {
+                                        if let Some(action) = render_expenses(ui, &mut self.budget) {
                                             match action {
                                                 HistoryAction::DeleteExpense(id) => {
                                                     self.budget.remove_expense(id);
+                                                    self.save();
+                                                }
+                                                HistoryAction::ToggleExpense(id) => {
+                                                    self.budget.toggle_expense_active(id);
                                                     self.save();
                                                 }
                                             }

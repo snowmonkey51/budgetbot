@@ -61,7 +61,7 @@ impl Budget {
     }
 
     pub fn total_expenses(&self) -> f64 {
-        self.expenses.iter().map(|e| e.amount).sum()
+        self.expenses.iter().filter(|e| e.active).map(|e| e.amount).sum()
     }
 
     pub fn remaining_balance(&self) -> f64 {
@@ -78,6 +78,12 @@ impl Budget {
 
     pub fn remove_expense(&mut self, id: Uuid) {
         self.expenses.retain(|e| e.id != id);
+    }
+
+    pub fn toggle_expense_active(&mut self, id: Uuid) {
+        if let Some(expense) = self.expenses.iter_mut().find(|e| e.id == id) {
+            expense.active = !expense.active;
+        }
     }
 
     pub fn add_category_with_color(&mut self, category: String, color: CategoryColor) {

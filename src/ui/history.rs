@@ -5,9 +5,10 @@ use crate::models::Budget;
 
 pub enum HistoryAction {
     DeleteExpense(Uuid),
+    ToggleExpense(Uuid),
 }
 
-pub fn render_expenses(ui: &mut Ui, budget: &Budget) -> Option<HistoryAction> {
+pub fn render_expenses(ui: &mut Ui, budget: &mut Budget) -> Option<HistoryAction> {
     let mut action = None;
 
     // Modern header
@@ -59,19 +60,36 @@ pub fn render_expenses(ui: &mut Ui, budget: &Budget) -> Option<HistoryAction> {
         });
     } else {
         // Sort expenses by date (most recent first)
-        let mut expenses: Vec<_> = budget.expenses.iter().collect();
-        expenses.sort_by(|a, b| b.date.cmp(&a.date));
+        let mut expense_indices: Vec<_> = budget.expenses.iter().enumerate().collect();
+        expense_indices.sort_by(|a, b| b.1.date.cmp(&a.1.date));
+        let sorted_indices: Vec<usize> = expense_indices.iter().map(|(i, _)| *i).collect();
 
         ui.spacing_mut().item_spacing = Vec2::new(6.0, 6.0);
 
-        for expense in &expenses {
+        for idx in sorted_indices {
+            let expense = &budget.expenses[idx];
+            let expense_id = expense.id;
+            let is_active = expense.active;
+
             let cat_color = budget.get_category_color(&expense.category);
             let base = Color32::from_rgb(cat_color[0], cat_color[1], cat_color[2]);
-            let bg_color = Color32::from_rgb(
-                250 - (250 - cat_color[0]) / 12,
-                250 - (250 - cat_color[1]) / 12,
-                250 - (250 - cat_color[2]) / 12,
-            );
+
+            // Dim colors if inactive
+            let bg_color = if is_active {
+                Color32::from_rgb(
+                    250 - (250 - cat_color[0]) / 12,
+                    250 - (250 - cat_color[1]) / 12,
+                    250 - (250 - cat_color[2]) / 12,
+                )
+            } else {
+                Color32::from_rgb(245, 245, 245)
+            };
+
+            let text_color = if is_active {
+                Color32::from_rgb(17, 24, 39)
+            } else {
+                Color32::from_rgb(180, 180, 180)
+            };
 
             egui::Frame::none()
                 .fill(bg_color)
@@ -80,13 +98,27 @@ pub fn render_expenses(ui: &mut Ui, budget: &Budget) -> Option<HistoryAction> {
                 .inner_margin(Margin::symmetric(12.0, 8.0))
                 .show(ui, |ui| {
                     ui.horizontal(|ui| {
+                        // Checkbox for active/inactive - centered vertically
+                        ui.vertical(|ui| {
+                            ui.add_space(8.0);
+                            let mut active = is_active;
+                            if ui.checkbox(&mut active, "").changed() {
+                                action = Some(HistoryAction::ToggleExpense(expense_id));
+                            }
+                        });
+
                         // Compact color indicator
-                        let color = Color32::from_rgb(cat_color[0], cat_color[1], cat_color[2]);
+                        let color = if is_active {
+                            Color32::from_rgb(cat_color[0], cat_color[1], cat_color[2])
+                        } else {
+                            Color32::from_rgb(200, 200, 200)
+                        };
                         let (rect, _) = ui.allocate_exact_size(Vec2::new(4.0, 32.0), egui::Sense::hover());
                         ui.painter().rect_filled(rect, Rounding::same(2.0), color);
                         ui.add_space(10.0);
 
                         // Left side: description and category on one line
+                        let expense = &budget.expenses[idx];
                         ui.vertical(|ui| {
                             ui.set_min_width(120.0);
 
@@ -99,16 +131,18 @@ pub fn render_expenses(ui: &mut Ui, budget: &Budget) -> Option<HistoryAction> {
                             ui.label(
                                 RichText::new(title)
                                     .size(13.0)
-                                    .color(Color32::from_rgb(17, 24, 39))
+                                    .color(text_color)
                                     .strong(),
                             );
 
                             // Category and date on same line, more compact
+                            let sub_color = if is_active { base } else { Color32::from_rgb(180, 180, 180) };
+                            let date_color = if is_active { Color32::from_rgb(156, 163, 175) } else { Color32::from_rgb(190, 190, 190) };
                             ui.horizontal(|ui| {
                                 ui.label(
                                     RichText::new(&expense.category)
                                         .size(10.0)
-                                        .color(base),
+                                        .color(sub_color),
                                 );
                                 ui.label(
                                     RichText::new("·")
@@ -118,7 +152,7 @@ pub fn render_expenses(ui: &mut Ui, budget: &Budget) -> Option<HistoryAction> {
                                 ui.label(
                                     RichText::new(expense.date.format("%b %d").to_string())
                                         .size(10.0)
-                                        .color(Color32::from_rgb(156, 163, 175)),
+                                        .color(date_color),
                                 );
                             });
                         });
@@ -138,7 +172,7 @@ pub fn render_expenses(ui: &mut Ui, budget: &Budget) -> Option<HistoryAction> {
                                 .min_size(Vec2::new(22.0, 22.0));
 
                                 if ui.add(del_btn).clicked() {
-                                    action = Some(HistoryAction::DeleteExpense(expense.id));
+                                    action = Some(HistoryAction::DeleteExpense(expense_id));
                                 }
 
                                 ui.add_space(8.0);
@@ -147,7 +181,7 @@ pub fn render_expenses(ui: &mut Ui, budget: &Budget) -> Option<HistoryAction> {
                                 ui.label(
                                     RichText::new(format!("-${:.2}", expense.amount))
                                         .size(14.0)
-                                        .color(Color32::from_rgb(17, 24, 39))
+                                        .color(text_color)
                                         .strong(),
                                 );
                             },

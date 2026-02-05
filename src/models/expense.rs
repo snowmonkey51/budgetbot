@@ -9,6 +9,12 @@ pub struct Expense {
     pub category: String,
     pub description: String,
     pub date: NaiveDate,
+    #[serde(default = "default_active")]
+    pub active: bool,
+}
+
+fn default_active() -> bool {
+    true
 }
 
 impl Expense {
@@ -19,6 +25,7 @@ impl Expense {
             category,
             description,
             date,
+            active: true,
         }
     }
 }
