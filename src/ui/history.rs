@@ -6,6 +6,7 @@ use crate::models::Budget;
 pub enum HistoryAction {
     DeleteExpense(Uuid),
     ToggleExpense(Uuid),
+    SaveAsPreset(Uuid),
 }
 
 /// Render the expenses header (title and count) - call this outside the scroll area
@@ -175,6 +176,22 @@ pub fn render_expenses(ui: &mut Ui, budget: &mut Budget) -> Option<HistoryAction
 
                                 if ui.add(del_btn).clicked() {
                                     action = Some(HistoryAction::DeleteExpense(expense_id));
+                                }
+
+                                ui.add_space(4.0);
+
+                                // Save as preset button
+                                let preset_btn = egui::Button::new(
+                                    RichText::new("⚡")
+                                        .size(10.0),
+                                )
+                                .fill(Color32::from_rgba_unmultiplied(0, 0, 0, 8))
+                                .stroke(Stroke::NONE)
+                                .rounding(Rounding::same(6.0))
+                                .min_size(Vec2::new(22.0, 22.0));
+
+                                if ui.add(preset_btn).on_hover_text("Save as preset").clicked() {
+                                    action = Some(HistoryAction::SaveAsPreset(expense_id));
                                 }
 
                                 ui.add_space(8.0);

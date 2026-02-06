@@ -8,6 +8,7 @@ use crate::models::{CategoryColor, Expense, Template};
 pub enum TemplateAction {
     Save(String),
     Load(Uuid),
+    Append(Uuid),  // Add template expenses without replacing existing ones
     Delete(Uuid),
     Rename(Uuid, String),
     UpdateExpenses(Uuid, Vec<Expense>),
@@ -362,9 +363,9 @@ impl TemplateManager {
                                                                 let del_btn = egui::Button::new(
                                                                     RichText::new("X")
                                                                         .size(12.0)
-                                                                        .color(Color32::from_rgb(220, 38, 38)),
+                                                                        .color(Color32::from_rgb(99, 102, 241)),
                                                                 )
-                                                                .fill(Color32::from_rgb(254, 242, 242))
+                                                                .fill(Color32::from_rgb(238, 242, 255))
                                                                 .stroke(Stroke::NONE)
                                                                 .rounding(Rounding::same(6.0))
                                                                 .min_size(Vec2::new(28.0, 28.0));
@@ -392,19 +393,35 @@ impl TemplateManager {
 
                                                                 ui.add_space(4.0);
 
-                                                                // Load button
+                                                                // Append button (adds to existing expenses)
+                                                                let append_btn = egui::Button::new(
+                                                                    RichText::new("Append")
+                                                                        .size(11.0)
+                                                                        .color(Color32::from_rgb(99, 102, 241)),
+                                                                )
+                                                                .fill(Color32::from_rgb(238, 242, 255))
+                                                                .stroke(Stroke::NONE)
+                                                                .rounding(Rounding::same(6.0))
+                                                                .min_size(Vec2::new(55.0, 28.0));
+
+                                                                if ui.add(append_btn).on_hover_text("Add to existing expenses").clicked() {
+                                                                    actions.push(TemplateAction::Append(template.id));
+                                                                }
+
+                                                                ui.add_space(4.0);
+
+                                                                // Load button (replaces existing expenses)
                                                                 let load_btn = egui::Button::new(
                                                                     RichText::new("Load")
                                                                         .size(11.0)
-                                                                        .color(Color32::WHITE)
-                                                                        .strong(),
+                                                                        .color(Color32::from_rgb(99, 102, 241)),
                                                                 )
-                                                                .fill(Color32::from_rgb(99, 102, 241))
+                                                                .fill(Color32::from_rgb(238, 242, 255))
                                                                 .stroke(Stroke::NONE)
                                                                 .rounding(Rounding::same(6.0))
                                                                 .min_size(Vec2::new(50.0, 28.0));
 
-                                                                if ui.add(load_btn).clicked() {
+                                                                if ui.add(load_btn).on_hover_text("Replace all expenses").clicked() {
                                                                     actions.push(TemplateAction::Load(template.id));
                                                                 }
                                                             },

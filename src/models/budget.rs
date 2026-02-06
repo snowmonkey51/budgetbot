@@ -1,8 +1,10 @@
+use chrono::Local;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
 use super::expense::Expense;
+use super::preset::ExpensePreset;
 use super::template::Template;
 
 /// RGB color stored as [r, g, b]
@@ -41,6 +43,8 @@ pub struct Budget {
     pub category_colors: HashMap<String, CategoryColor>,
     #[serde(default)]
     pub templates: Vec<Template>,
+    #[serde(default)]
+    pub presets: Vec<ExpensePreset>,
 }
 
 impl Default for Budget {
@@ -51,6 +55,7 @@ impl Default for Budget {
             categories: default_categories(),
             category_colors: default_category_colors(),
             templates: Vec::new(),
+            presets: Vec::new(),
         }
     }
 }
@@ -124,10 +129,21 @@ impl Budget {
 
     pub fn load_template(&mut self, id: Uuid) {
         if let Some(template) = self.templates.iter().find(|t| t.id == id) {
-            // Clone expenses from template, giving them new IDs
+            // Clone expenses from template, giving them new IDs (replaces existing)
             self.expenses = template.expenses.iter().map(|e| {
                 Expense::new(e.amount, e.category.clone(), e.description.clone(), e.date)
             }).collect();
+        }
+    }
+
+    /// Append template expenses to existing expenses (does not replace)
+    pub fn append_template(&mut self, id: Uuid) {
+        if let Some(template) = self.templates.iter().find(|t| t.id == id) {
+            // Clone expenses from template with new IDs and add to existing
+            for e in &template.expenses {
+                let expense = Expense::new(e.amount, e.category.clone(), e.description.clone(), e.date);
+                self.expenses.push(expense);
+            }
         }
     }
 
@@ -144,6 +160,45 @@ impl Budget {
     pub fn update_template_expenses(&mut self, id: Uuid, expenses: Vec<Expense>) {
         if let Some(template) = self.templates.iter_mut().find(|t| t.id == id) {
             template.expenses = expenses;
+        }
+    }
+
+    // Preset management
+    pub fn add_preset(&mut self, preset: ExpensePreset) {
+        self.presets.push(preset);
+    }
+
+    pub fn remove_preset(&mut self, id: Uuid) {
+        self.presets.retain(|p| p.id != id);
+    }
+
+    pub fn get_preset(&self, id: Uuid) -> Option<&ExpensePreset> {
+        self.presets.iter().find(|p| p.id == id)
+    }
+
+    /// Create an expense from a preset with today's date
+    pub fn create_expense_from_preset(&mut self, preset_id: Uuid) {
+        if let Some(preset) = self.get_preset(preset_id).cloned() {
+            let expense = Expense::new(
+                preset.amount,
+                preset.category,
+                preset.description,
+                Local::now().date_naive(),
+            );
+            self.expenses.push(expense);
+        }
+    }
+
+    /// Create a preset from an existing expense
+    pub fn create_preset_from_expense(&mut self, expense_id: Uuid, name: String) {
+        if let Some(expense) = self.expenses.iter().find(|e| e.id == expense_id) {
+            let preset = ExpensePreset::new(
+                name,
+                expense.amount,
+                expense.category.clone(),
+                expense.description.clone(),
+            );
+            self.presets.push(preset);
         }
     }
 }

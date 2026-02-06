@@ -10,36 +10,18 @@ pub fn render_dashboard(ui: &mut Ui, budget: &Budget) -> bool {
     let mut edit_clicked = false;
 
     ui.vertical(|ui| {
-        // Header with modern Edit button
-        ui.horizontal(|ui| {
-            ui.label(
-                RichText::new("Available Balance")
-                    .size(13.0)
-                    .color(Color32::from_rgb(107, 114, 128)),
-            );
-
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                let edit_btn = egui::Button::new(
-                    RichText::new("Edit")
-                        .size(12.0)
-                        .color(Color32::from_rgb(99, 102, 241)),
-                )
-                .fill(Color32::from_rgb(238, 242, 255))
-                .stroke(Stroke::new(1.0, Color32::from_rgb(199, 210, 254)))
-                .rounding(Rounding::same(8.0))
-                .min_size(Vec2::new(65.0, 28.0));
-
-                if ui.add(edit_btn).clicked() {
-                    edit_clicked = true;
-                }
-            });
-        });
+        // Header
+        ui.label(
+            RichText::new("Available Balance")
+                .size(13.0)
+                .color(Color32::from_rgb(107, 114, 128)),
+        );
 
         ui.add_space(8.0);
 
         // Large available balance display
         let balance_color = if available_balance >= 0.0 {
-            Color32::from_rgb(16, 185, 129) // Green for positive
+            Color32::from_rgb(17, 24, 39) // Dark text for positive
         } else {
             Color32::from_rgb(239, 68, 68) // Red for negative
         };
@@ -53,7 +35,7 @@ pub fn render_dashboard(ui: &mut Ui, budget: &Budget) -> bool {
 
         ui.add_space(20.0);
 
-        // Income summary card - green style
+        // Income summary card - green style with Edit button
         egui::Frame::none()
             .fill(Color32::from_rgb(236, 253, 245))
             .rounding(Rounding::same(12.0))
@@ -73,6 +55,24 @@ pub fn render_dashboard(ui: &mut Ui, budget: &Budget) -> bool {
                             .size(13.0)
                             .color(Color32::from_rgb(6, 95, 70)),
                     );
+
+                    ui.add_space(12.0);
+
+                    // Edit button
+                    let edit_btn = egui::Button::new(
+                        RichText::new("Edit")
+                            .size(11.0)
+                            .color(Color32::from_rgb(5, 150, 105)),
+                    )
+                    .fill(Color32::from_rgb(209, 250, 229))
+                    .stroke(Stroke::new(1.0, Color32::from_rgb(167, 243, 208)))
+                    .rounding(Rounding::same(6.0))
+                    .min_size(Vec2::new(50.0, 24.0));
+
+                    if ui.add(edit_btn).clicked() {
+                        edit_clicked = true;
+                    }
+
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         ui.label(
                             RichText::new(format!("${:.2}", total_income))

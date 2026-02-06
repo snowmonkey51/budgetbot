@@ -3,7 +3,7 @@ use eframe::egui::{self, Color32, FontFamily, FontId, Margin, Rounding, Stroke, 
 
 use crate::models::Budget;
 use crate::storage::{load_budget, save_budget};
-use crate::ui::{render_balance_bar, render_dashboard, render_expenses, render_expenses_header, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm, TemplateAction, TemplateManager};
+use crate::ui::{render_balance_bar, render_dashboard, render_expenses, render_expenses_header, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm, PresetAction, PresetPanel, TemplateAction, TemplateManager};
 
 /// Get the path to a resource file, checking both development and bundle paths
 fn get_resource_path(relative_path: &str) -> Option<PathBuf> {
@@ -45,6 +45,7 @@ pub struct BudgetApp {
     category_manager: CategoryManager,
     calculator: Calculator,
     template_manager: TemplateManager,
+    preset_panel: PresetPanel,
     logo_texture: Option<TextureHandle>,
 }
 
@@ -63,6 +64,7 @@ impl BudgetApp {
             category_manager: CategoryManager::new(),
             calculator: Calculator::new(),
             template_manager: TemplateManager::new(),
+            preset_panel: PresetPanel::new(),
             logo_texture,
         }
     }
@@ -213,6 +215,11 @@ impl eframe::App for BudgetApp {
                     self.save();
                     self.template_manager.close();
                 }
+                TemplateAction::Append(id) => {
+                    self.budget.append_template(id);
+                    self.save();
+                    self.template_manager.close();
+                }
                 TemplateAction::Delete(id) => {
                     self.budget.delete_template(id);
                     self.save();
@@ -225,6 +232,39 @@ impl eframe::App for BudgetApp {
                     self.budget.update_template_expenses(id, expenses);
                     self.save();
                 }
+            }
+        }
+
+        // Render preset panel (slide-out on right)
+        let preset_actions = self.preset_panel.render(
+            ctx,
+            &self.budget.presets,
+            &self.budget.categories,
+            &self.budget.category_colors,
+        );
+        for action in preset_actions {
+            match action {
+                PresetAction::Create(preset) => {
+                    self.budget.add_preset(preset);
+                    self.save();
+                }
+                PresetAction::Delete(id) => {
+                    self.budget.remove_preset(id);
+                    self.save();
+                }
+                PresetAction::AddToExpenses(id) => {
+                    self.budget.create_expense_from_preset(id);
+                    self.save();
+                }
+            }
+        }
+
+        // Check if drag ended outside panel (for drag-to-add)
+        if self.preset_panel.is_dragging() && !ctx.input(|i| i.pointer.any_down()) {
+            if let Some(preset_id) = self.preset_panel.end_drag() {
+                // Drag released - add the expense
+                self.budget.create_expense_from_preset(preset_id);
+                self.save();
             }
         }
 
@@ -265,6 +305,41 @@ impl eframe::App for BudgetApp {
                         .strong());
 
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        // Quick Add button (rightmost)
+                        let is_open = self.preset_panel.is_open;
+                        let btn_color = if is_open {
+                            Color32::from_rgb(16, 185, 129)  // Green when open
+                        } else {
+                            Color32::from_rgb(99, 102, 241)  // Indigo when closed
+                        };
+                        let btn_fill = if is_open {
+                            Color32::from_rgb(236, 253, 245)  // Light green bg when open
+                        } else {
+                            Color32::from_rgb(238, 242, 255)  // Light indigo bg when closed
+                        };
+                        let btn_stroke = if is_open {
+                            Color32::from_rgb(167, 243, 208)  // Green stroke when open
+                        } else {
+                            Color32::from_rgb(199, 210, 254)  // Indigo stroke when closed
+                        };
+
+                        let preset_btn = egui::Button::new(
+                            egui::RichText::new("⚡ Quick Add")
+                                .size(13.0)
+                                .color(btn_color),
+                        )
+                        .fill(btn_fill)
+                        .stroke(Stroke::new(1.0, btn_stroke))
+                        .rounding(Rounding::same(12.0))
+                        .min_size(Vec2::new(100.0, 36.0));
+
+                        if ui.add(preset_btn).clicked() {
+                            self.preset_panel.toggle();
+                        }
+
+                        ui.add_space(8.0);
+
+                        // Categories button (middle)
                         let manage_btn = egui::Button::new(
                             egui::RichText::new("⚙ Categories")
                                 .size(13.0)
@@ -281,6 +356,7 @@ impl eframe::App for BudgetApp {
 
                         ui.add_space(8.0);
 
+                        // Calculator button (leftmost)
                         let calc_btn = egui::Button::new(
                             egui::RichText::new("Calculator")
                                 .size(13.0)
@@ -408,6 +484,22 @@ impl eframe::App for BudgetApp {
                                                 HistoryAction::ToggleExpense(id) => {
                                                     self.budget.toggle_expense_active(id);
                                                     self.save();
+                                                }
+                                                HistoryAction::SaveAsPreset(id) => {
+                                                    // Open preset panel with expense data pre-filled
+                                                    if let Some(expense) = self.budget.expenses.iter().find(|e| e.id == id) {
+                                                        let name = if expense.description.is_empty() {
+                                                            expense.category.clone()
+                                                        } else {
+                                                            expense.description.clone()
+                                                        };
+                                                        self.preset_panel.init_from_expense(
+                                                            name,
+                                                            expense.amount,
+                                                            expense.category.clone(),
+                                                            expense.description.clone(),
+                                                        );
+                                                    }
                                                 }
                                             }
                                         }
