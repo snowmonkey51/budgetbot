@@ -10,6 +10,7 @@ use super::template::Template;
 /// RGB color stored as [r, g, b]
 pub type CategoryColor = [u8; 3];
 
+/// Default categories with their RGB colors
 pub const DEFAULT_CATEGORIES: &[(&str, [u8; 3])] = &[
     ("Food & Groceries", [34, 197, 94]),    // Green
     ("Transportation", [59, 130, 246]),     // Blue

@@ -1,9 +1,18 @@
 use std::path::PathBuf;
 use eframe::egui::{self, Color32, FontFamily, FontId, Margin, Rounding, Stroke, TextureHandle, Vec2};
+use chrono::Local;
 
-use crate::models::Budget;
-use crate::storage::{load_budget, save_budget};
-use crate::ui::{render_balance_bar, render_dashboard, render_expenses, render_expenses_header, Calculator, CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm, PresetAction, PresetPanel, TemplateAction, TemplateManager};
+use crate::models::{AppConfig, Budget, Expense, ExpensePreset, ProfileData, ProfileMeta, SharedData, Template};
+use crate::storage::{
+    delete_profile_file, duplicate_profile, load_config, load_profile, load_shared_data,
+    migrate_legacy_budget, save_config, save_profile, save_shared_data,
+};
+use crate::ui::{
+    render_balance_bar, render_dashboard, render_expenses, render_expenses_header, Calculator,
+    CategoryAction, CategoryManager, ExpenseForm, HistoryAction, IncomeForm, PresetAction,
+    PresetPanel, ProfileAction, ProfileManager, ProfileSelector, ProfileSelectorAction,
+    TemplateAction, TemplateManager,
+};
 
 /// Get the path to a resource file, checking both development and bundle paths
 fn get_resource_path(relative_path: &str) -> Option<PathBuf> {
@@ -39,25 +48,56 @@ fn get_resource_path(relative_path: &str) -> Option<PathBuf> {
 }
 
 pub struct BudgetApp {
+    // Profile system
+    config: AppConfig,
+    current_profile_id: String,
+    profile_data: ProfileData,
+    shared_data: SharedData,
+
+    // Composed budget view for UI compatibility
     budget: Budget,
+
+    // UI components
     expense_form: ExpenseForm,
     income_form: IncomeForm,
     category_manager: CategoryManager,
     calculator: Calculator,
     template_manager: TemplateManager,
     preset_panel: PresetPanel,
+    profile_selector: ProfileSelector,
+    profile_manager: ProfileManager,
+
     logo_texture: Option<TextureHandle>,
 }
 
 impl BudgetApp {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         configure_styles(&cc.egui_ctx);
-        let budget = load_budget();
+
+        // Run migration if needed (from old budget.json to new profile structure)
+        let _ = migrate_legacy_budget();
+
+        // Load configuration
+        let config = load_config();
+
+        // Load shared data (categories, presets, templates)
+        let shared_data = load_shared_data();
+
+        // Load active profile data
+        let current_profile_id = config.active_profile_id.clone();
+        let profile_data = load_profile(&current_profile_id);
+
+        // Compose budget view for UI compatibility
+        let budget = compose_budget(&profile_data, &shared_data);
 
         // Load the logo image
         let logo_texture = load_logo(&cc.egui_ctx);
 
         Self {
+            config,
+            current_profile_id,
+            profile_data,
+            shared_data,
             budget,
             expense_form: ExpenseForm::new(),
             income_form: IncomeForm::new(),
@@ -65,12 +105,116 @@ impl BudgetApp {
             calculator: Calculator::new(),
             template_manager: TemplateManager::new(),
             preset_panel: PresetPanel::new(),
+            profile_selector: ProfileSelector::new(),
+            profile_manager: ProfileManager::new(),
             logo_texture,
         }
     }
 
+    /// Switch to a different profile
+    fn switch_profile(&mut self, profile_id: &str) {
+        // Save current profile first
+        self.save_profile();
+
+        // Load new profile
+        self.current_profile_id = profile_id.to_string();
+        self.profile_data = load_profile(profile_id);
+
+        // Update config
+        self.config.active_profile_id = profile_id.to_string();
+        let _ = save_config(&self.config);
+
+        // Recompose budget view
+        self.recompose_budget();
+    }
+
+    /// Cycle to the next profile in the list
+    fn cycle_to_next_profile(&mut self) {
+        if self.config.profiles.len() <= 1 {
+            return; // Nothing to cycle through
+        }
+
+        // Find current profile index
+        let current_index = self.config.profiles
+            .iter()
+            .position(|p| p.id == self.current_profile_id)
+            .unwrap_or(0);
+
+        // Get next profile (wrapping around)
+        let next_index = (current_index + 1) % self.config.profiles.len();
+        let next_profile_id = self.config.profiles[next_index].id.clone();
+
+        self.switch_profile(&next_profile_id);
+    }
+
+    /// Save profile-specific data only
+    fn save_profile(&self) {
+        let _ = save_profile(&self.current_profile_id, &self.profile_data);
+    }
+
+    /// Save shared data only
+    fn save_shared(&self) {
+        let _ = save_shared_data(&self.shared_data);
+    }
+
+    /// Recompose the budget view after changes
+    fn recompose_budget(&mut self) {
+        self.budget = compose_budget(&self.profile_data, &self.shared_data);
+    }
+
+    /// Save both profile and shared data (legacy compatibility)
     fn save(&mut self) {
-        let _ = save_budget(&self.budget);
+        self.save_profile();
+        self.save_shared();
+        self.recompose_budget();
+    }
+
+    /// Handle profile management actions
+    fn handle_profile_action(&mut self, action: ProfileAction) {
+        match action {
+            ProfileAction::Create(name) => {
+                let id = self.config.generate_profile_id(&name);
+                let meta = ProfileMeta::new(id.clone(), name);
+                self.config.add_profile(meta);
+                let _ = save_config(&self.config);
+                // Create empty profile file
+                let _ = save_profile(&id, &ProfileData::default());
+            }
+            ProfileAction::Duplicate(source_id, new_name) => {
+                let new_id = self.config.generate_profile_id(&new_name);
+                let meta = ProfileMeta::new(new_id.clone(), new_name);
+                self.config.add_profile(meta);
+                let _ = save_config(&self.config);
+                // Duplicate the profile data
+                let _ = duplicate_profile(&source_id, &new_id);
+            }
+            ProfileAction::Rename(id, new_name) => {
+                self.config.rename_profile(&id, new_name);
+                let _ = save_config(&self.config);
+            }
+            ProfileAction::Delete(id) => {
+                if self.config.remove_profile(&id) {
+                    let _ = delete_profile_file(&id);
+                    let _ = save_config(&self.config);
+                }
+            }
+            ProfileAction::Switch(id) => {
+                self.switch_profile(&id);
+                self.profile_manager.close();
+            }
+        }
+    }
+}
+
+/// Compose a Budget view from profile and shared data
+fn compose_budget(profile: &ProfileData, shared: &SharedData) -> Budget {
+    Budget {
+        income: profile.income,
+        expenses: profile.expenses.clone(),
+        categories: shared.categories.clone(),
+        category_colors: shared.category_colors.clone(),
+        templates: shared.templates.clone(),
+        presets: shared.presets.clone(),
     }
 }
 
@@ -154,20 +298,23 @@ fn configure_styles(ctx: &egui::Context) {
 impl eframe::App for BudgetApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Render category manager popup window
-        let actions = self.category_manager.render(ctx, &self.budget.categories, &self.budget.category_colors);
+        let actions = self.category_manager.render(ctx, &self.shared_data.categories, &self.shared_data.category_colors);
         for action in actions {
             match action {
                 CategoryAction::Add(name, color) => {
-                    self.budget.add_category_with_color(name, color);
-                    self.save();
+                    self.shared_data.add_category_with_color(name, color);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
                 CategoryAction::Delete(name) => {
-                    self.budget.remove_category(&name);
-                    self.save();
+                    self.shared_data.remove_category(&name);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
                 CategoryAction::UpdateColor(name, color) => {
-                    self.budget.set_category_color(&name, color);
-                    self.save();
+                    self.shared_data.set_category_color(&name, color);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
             }
         }
@@ -175,22 +322,25 @@ impl eframe::App for BudgetApp {
         // Render expense form popup window
         let (expense, new_cat) = self.expense_form.render(
             ctx,
-            &self.budget.categories,
-            &self.budget.category_colors,
+            &self.shared_data.categories,
+            &self.shared_data.category_colors,
         );
         if let Some((cat_name, cat_color)) = new_cat {
-            self.budget.add_category_with_color(cat_name, cat_color);
-            self.save();
+            self.shared_data.add_category_with_color(cat_name, cat_color);
+            self.save_shared();
+            self.recompose_budget();
         }
         if let Some(exp) = expense {
-            self.budget.add_expense(exp);
-            self.save();
+            self.profile_data.expenses.push(exp);
+            self.save_profile();
+            self.recompose_budget();
         }
 
         // Render income form popup window
         if let Some(new_income) = self.income_form.render(ctx) {
-            self.budget.set_income(new_income);
-            self.save();
+            self.profile_data.income = new_income;
+            self.save_profile();
+            self.recompose_budget();
         }
 
         // Render calculator popup window
@@ -199,38 +349,56 @@ impl eframe::App for BudgetApp {
         // Render template manager popup window
         let template_actions = self.template_manager.render(
             ctx,
-            &self.budget.templates,
-            self.budget.expenses.len(),
-            &self.budget.categories,
-            &self.budget.category_colors,
+            &self.shared_data.templates,
+            self.profile_data.expenses.len(),
+            &self.shared_data.categories,
+            &self.shared_data.category_colors,
         );
         for action in template_actions {
             match action {
                 TemplateAction::Save(name) => {
-                    self.budget.save_template(name);
-                    self.save();
+                    let template = Template::new(name, self.profile_data.expenses.clone());
+                    self.shared_data.add_template(template);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
                 TemplateAction::Load(id) => {
-                    self.budget.load_template(id);
-                    self.save();
+                    // Load template expenses into profile (replaces)
+                    if let Some(template) = self.shared_data.templates.iter().find(|t| t.id == id) {
+                        self.profile_data.expenses = template.expenses.iter().map(|e| {
+                            Expense::new(e.amount, e.category.clone(), e.description.clone(), e.date)
+                        }).collect();
+                        self.save_profile();
+                        self.recompose_budget();
+                    }
                     self.template_manager.close();
                 }
                 TemplateAction::Append(id) => {
-                    self.budget.append_template(id);
-                    self.save();
+                    // Append template expenses to profile
+                    if let Some(template) = self.shared_data.templates.iter().find(|t| t.id == id) {
+                        for e in &template.expenses {
+                            let expense = Expense::new(e.amount, e.category.clone(), e.description.clone(), e.date);
+                            self.profile_data.expenses.push(expense);
+                        }
+                        self.save_profile();
+                        self.recompose_budget();
+                    }
                     self.template_manager.close();
                 }
                 TemplateAction::Delete(id) => {
-                    self.budget.delete_template(id);
-                    self.save();
+                    self.shared_data.delete_template(id);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
                 TemplateAction::Rename(id, new_name) => {
-                    self.budget.rename_template(id, new_name);
-                    self.save();
+                    self.shared_data.rename_template(id, new_name);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
                 TemplateAction::UpdateExpenses(id, expenses) => {
-                    self.budget.update_template_expenses(id, expenses);
-                    self.save();
+                    self.shared_data.update_template_expenses(id, expenses);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
             }
         }
@@ -238,23 +406,35 @@ impl eframe::App for BudgetApp {
         // Render preset panel (slide-out on right)
         let preset_actions = self.preset_panel.render(
             ctx,
-            &self.budget.presets,
-            &self.budget.categories,
-            &self.budget.category_colors,
+            &self.shared_data.presets,
+            &self.shared_data.categories,
+            &self.shared_data.category_colors,
         );
         for action in preset_actions {
             match action {
                 PresetAction::Create(preset) => {
-                    self.budget.add_preset(preset);
-                    self.save();
+                    self.shared_data.add_preset(preset);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
                 PresetAction::Delete(id) => {
-                    self.budget.remove_preset(id);
-                    self.save();
+                    self.shared_data.remove_preset(id);
+                    self.save_shared();
+                    self.recompose_budget();
                 }
                 PresetAction::AddToExpenses(id) => {
-                    self.budget.create_expense_from_preset(id);
-                    self.save();
+                    // Create expense from preset
+                    if let Some(preset) = self.shared_data.get_preset(id).cloned() {
+                        let expense = Expense::new(
+                            preset.amount,
+                            preset.category,
+                            preset.description,
+                            Local::now().date_naive(),
+                        );
+                        self.profile_data.expenses.push(expense);
+                        self.save_profile();
+                        self.recompose_budget();
+                    }
                 }
             }
         }
@@ -263,8 +443,75 @@ impl eframe::App for BudgetApp {
         if self.preset_panel.is_dragging() && !ctx.input(|i| i.pointer.any_down()) {
             if let Some(preset_id) = self.preset_panel.end_drag() {
                 // Drag released - add the expense
-                self.budget.create_expense_from_preset(preset_id);
-                self.save();
+                if let Some(preset) = self.shared_data.get_preset(preset_id).cloned() {
+                    let expense = Expense::new(
+                        preset.amount,
+                        preset.category,
+                        preset.description,
+                        Local::now().date_naive(),
+                    );
+                    self.profile_data.expenses.push(expense);
+                    self.save_profile();
+                    self.recompose_budget();
+                }
+            }
+        }
+
+        // Render profile manager modal
+        let profile_actions = self.profile_manager.render(
+            ctx,
+            &self.config.profiles,
+            &self.current_profile_id,
+        );
+        for action in profile_actions {
+            self.handle_profile_action(action);
+        }
+
+        // Keyboard shortcuts (only when no modals are open and no text input is focused)
+        let any_modal_open = self.expense_form.is_open
+            || self.income_form.is_open
+            || self.template_manager.is_open
+            || self.category_manager.is_open
+            || self.calculator.is_open
+            || self.profile_manager.is_open
+            || self.profile_selector.is_popup_open();
+
+        if !any_modal_open && !ctx.wants_keyboard_input() {
+            let e_pressed = ctx.input(|i| i.key_pressed(egui::Key::E));
+            let t_pressed = ctx.input(|i| i.key_pressed(egui::Key::T));
+            let c_pressed = ctx.input(|i| i.key_pressed(egui::Key::C));
+            let p_pressed = ctx.input(|i| i.key_pressed(egui::Key::P) && !i.modifiers.command);
+            let cmd_p_pressed = ctx.input(|i| i.key_pressed(egui::Key::P) && i.modifiers.command);
+            let q_pressed = ctx.input(|i| i.key_pressed(egui::Key::Q));
+            let i_pressed = ctx.input(|i| i.key_pressed(egui::Key::I));
+
+            // E - Add Expense
+            if e_pressed {
+                self.expense_form.open();
+            }
+            // T - Templates
+            if t_pressed {
+                self.template_manager.open();
+            }
+            // C - Calculator
+            if c_pressed {
+                self.calculator.open();
+            }
+            // P - Switch Profiles (cycle to next profile)
+            if p_pressed {
+                self.cycle_to_next_profile();
+            }
+            // Cmd+P - Open Profile Manager
+            if cmd_p_pressed {
+                self.profile_manager.open();
+            }
+            // Q - Quick Add
+            if q_pressed {
+                self.preset_panel.is_open = !self.preset_panel.is_open;
+            }
+            // I - Edit Income
+            if i_pressed {
+                self.income_form.open(self.budget.income);
             }
         }
 
@@ -284,9 +531,17 @@ impl eframe::App for BudgetApp {
                 render_balance_bar(ui, &self.budget);
             });
 
+        // Use a light red background when not in the main profile
+        let is_main_profile = self.current_profile_id == "main";
+        let bg_color = if is_main_profile {
+            Color32::from_rgb(245, 247, 250)  // Default light gray
+        } else {
+            Color32::from_rgb(255, 245, 245)  // Light red for other profiles
+        };
+
         egui::CentralPanel::default()
             .frame(egui::Frame::none()
-                .fill(Color32::from_rgb(245, 247, 250))
+                .fill(bg_color)
                 .inner_margin(Margin::same(28.0)))
             .show(ctx, |ui| {
                 ui.style_mut().spacing.item_spacing = Vec2::new(12.0, 14.0);
@@ -333,7 +588,7 @@ impl eframe::App for BudgetApp {
                         .rounding(Rounding::same(12.0))
                         .min_size(Vec2::new(100.0, 36.0));
 
-                        if ui.add(preset_btn).clicked() {
+                        if ui.add(preset_btn).on_hover_text("Keyboard shortcut: Q").clicked() {
                             self.preset_panel.toggle();
                         }
 
@@ -350,7 +605,7 @@ impl eframe::App for BudgetApp {
                         .rounding(Rounding::same(12.0))
                         .min_size(Vec2::new(110.0, 36.0));
 
-                        if ui.add(manage_btn).clicked() {
+                        if ui.add(manage_btn).on_hover_text("Manage expense categories").clicked() {
                             self.category_manager.open();
                         }
 
@@ -367,7 +622,7 @@ impl eframe::App for BudgetApp {
                         .rounding(Rounding::same(12.0))
                         .min_size(Vec2::new(100.0, 36.0));
 
-                        if ui.add(calc_btn).clicked() {
+                        if ui.add(calc_btn).on_hover_text("Keyboard shortcut: C").clicked() {
                             self.calculator.open();
                         }
                     });
@@ -421,7 +676,7 @@ impl eframe::App for BudgetApp {
                             .rounding(Rounding::same(14.0))
                             .min_size(Vec2::new(left_column_width - 8.0, 50.0));
 
-                            if ui.add(expense_btn).clicked() {
+                            if ui.add(expense_btn).on_hover_text("Keyboard shortcut: E").clicked() {
                                 self.expense_form.open();
                             }
                         });
@@ -441,8 +696,29 @@ impl eframe::App for BudgetApp {
                             .rounding(Rounding::same(14.0))
                             .min_size(Vec2::new(left_column_width - 8.0, 50.0));
 
-                            if ui.add(template_btn).clicked() {
+                            if ui.add(template_btn).on_hover_text("Keyboard shortcut: T").clicked() {
                                 self.template_manager.open();
+                            }
+                        });
+
+                        ui.add_space(12.0);
+
+                        // Profile selector dropdown
+                        ui.vertical_centered(|ui| {
+                            if let Some(action) = self.profile_selector.render(
+                                ui,
+                                &self.config.profiles,
+                                &self.current_profile_id,
+                                left_column_width - 8.0,
+                            ) {
+                                match action {
+                                    ProfileSelectorAction::SwitchProfile(id) => {
+                                        self.switch_profile(&id);
+                                    }
+                                    ProfileSelectorAction::OpenManager => {
+                                        self.profile_manager.open();
+                                    }
+                                }
                             }
                         });
                     });
@@ -478,16 +754,20 @@ impl eframe::App for BudgetApp {
                                         if let Some(action) = render_expenses(ui, &mut self.budget) {
                                             match action {
                                                 HistoryAction::DeleteExpense(id) => {
-                                                    self.budget.remove_expense(id);
-                                                    self.save();
+                                                    self.profile_data.expenses.retain(|e| e.id != id);
+                                                    self.save_profile();
+                                                    self.recompose_budget();
                                                 }
                                                 HistoryAction::ToggleExpense(id) => {
-                                                    self.budget.toggle_expense_active(id);
-                                                    self.save();
+                                                    if let Some(exp) = self.profile_data.expenses.iter_mut().find(|e| e.id == id) {
+                                                        exp.active = !exp.active;
+                                                    }
+                                                    self.save_profile();
+                                                    self.recompose_budget();
                                                 }
                                                 HistoryAction::SaveAsPreset(id) => {
                                                     // Open preset panel with expense data pre-filled
-                                                    if let Some(expense) = self.budget.expenses.iter().find(|e| e.id == id) {
+                                                    if let Some(expense) = self.profile_data.expenses.iter().find(|e| e.id == id) {
                                                         let name = if expense.description.is_empty() {
                                                             expense.category.clone()
                                                         } else {

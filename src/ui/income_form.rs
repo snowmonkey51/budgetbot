@@ -1,9 +1,10 @@
-use egui::{Color32, Margin, RichText, Rounding, Stroke, TextEdit, Vec2};
+use egui::{Color32, Key, Margin, RichText, Rounding, Stroke, TextEdit, Vec2};
 
 #[derive(Default)]
 pub struct IncomeForm {
     pub is_open: bool,
     pub amount: String,
+    request_focus: bool,
 }
 
 impl IncomeForm {
@@ -11,12 +12,14 @@ impl IncomeForm {
         Self {
             is_open: false,
             amount: String::new(),
+            request_focus: false,
         }
     }
 
     /// Open the form with the current income value
     pub fn open(&mut self, current_income: f64) {
         self.is_open = true;
+        self.request_focus = true;
         if current_income > 0.0 {
             self.amount = format!("{:.2}", current_income);
         } else {
@@ -26,6 +29,7 @@ impl IncomeForm {
 
     pub fn close(&mut self) {
         self.is_open = false;
+        self.request_focus = false;
     }
 
     /// Returns Some(new_income_amount) if saved, None otherwise
@@ -99,13 +103,28 @@ impl IncomeForm {
                         .show(ui, |ui| {
                             ui.horizontal(|ui| {
                                 ui.label(RichText::new("$").size(20.0).color(Color32::from_rgb(107, 114, 128)));
-                                ui.add(
-                                    TextEdit::singleline(&mut self.amount)
-                                        .desired_width(220.0)
-                                        .hint_text("0.00")
-                                        .frame(false)
-                                        .font(egui::TextStyle::Heading),
-                                );
+                                let text_edit = TextEdit::singleline(&mut self.amount)
+                                    .desired_width(220.0)
+                                    .hint_text("0.00")
+                                    .frame(false)
+                                    .font(egui::TextStyle::Heading);
+                                let response = ui.add(text_edit);
+
+                                // Request focus when form first opens
+                                if self.request_focus {
+                                    response.request_focus();
+                                    self.request_focus = false;
+                                }
+
+                                // Handle Enter key to save
+                                if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+                                    if let Ok(amount) = self.amount.parse::<f64>() {
+                                        if amount >= 0.0 {
+                                            result = Some(amount);
+                                            should_close = true;
+                                        }
+                                    }
+                                }
                             });
                         });
                 });

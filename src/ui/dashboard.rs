@@ -69,7 +69,7 @@ pub fn render_dashboard(ui: &mut Ui, budget: &Budget) -> bool {
                     .rounding(Rounding::same(6.0))
                     .min_size(Vec2::new(50.0, 24.0));
 
-                    if ui.add(edit_btn).clicked() {
+                    if ui.add(edit_btn).on_hover_text("Keyboard shortcut: I").clicked() {
                         edit_clicked = true;
                     }
 
